@@ -1,0 +1,23 @@
+surf/
+├── backend/          # Express + TypeScript API server
+│   ├── src/
+│   │   ├── models/       # MongoDB Mongoose models
+│   │   ├── routes/       # Express route handlers
+│   │   ├── middleware/   # Auth, roles, error handling
+│   │   ├── utils/        # Helper functions
+│   │   └── server.ts     # Entry point
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── frontend/         # Next.js + Tailwind
+│   ├── src/
+│   │   ├── app/          # Next.js App Router pages
+│   │   ├── components/   # Reusable UI components
+│   │   ├── lib/          # API helpers, auth context
+│   │   └── types/        # TypeScript interfaces
+│   ├── package.json
+│   ├── tailwind.config.ts
+│   └── tsconfig.json
+
+
+Default accounts: admin@surfbooking.com / admin123 (super admin), owner@balisurfcamp.com / owner123 (company owner)

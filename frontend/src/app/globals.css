@@ -1,0 +1,46 @@
+/* ================================
+   GLOBAL STYLES
+   Tailwind CSS base styles
+   ================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom base styles */
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+/* Custom utility classes */
+@layer components {
+  /* Reusable button styles */
+  .btn-primary {
+    @apply bg-ocean-600 hover:bg-ocean-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+
+  /* Input style */
+  .input {
+    @apply w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-transparent;
+  }
+
+  /* Card style */
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+  }
+
+  /* Badge style */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+}
