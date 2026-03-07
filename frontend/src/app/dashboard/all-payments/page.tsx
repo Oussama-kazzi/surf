@@ -35,12 +35,12 @@ export default function AdminAllPaymentsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold">All Payments (Platform)</h1>
-          <p className="text-gray-500">
+          <h1 className="page-title">All Payments (Platform)</h1>
+          <p className="page-subtitle">
             Platform Revenue:{" "}
-            <span className="font-bold text-green-600">
+            <span className="font-bold text-emerald-600">
               {formatPrice(totalRevenue)}
             </span>
           </p>
@@ -48,22 +48,26 @@ export default function AdminAllPaymentsPage() {
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading...</p>
+        <div className="flex items-center gap-3 py-12">
+          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <span className="loading-text">Loading payments...</span>
+        </div>
       ) : payments.length === 0 ? (
-        <div className="card text-center py-12">
-          <p className="text-gray-500">No payments recorded yet.</p>
+        <div className="empty-state">
+          <div className="empty-state-icon">💳</div>
+          <p className="empty-state-text">No payments recorded yet.</p>
         </div>
       ) : (
-        <div className="card overflow-x-auto">
+        <div className="table-container">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="pb-3 font-medium">Company</th>
-                <th className="pb-3 font-medium">Customer</th>
-                <th className="pb-3 font-medium">Amount</th>
-                <th className="pb-3 font-medium">Method</th>
-                <th className="pb-3 font-medium">Status</th>
-                <th className="pb-3 font-medium">Date</th>
+              <tr className="table-header">
+                <th className="table-cell font-medium">Company</th>
+                <th className="table-cell font-medium">Customer</th>
+                <th className="table-cell font-medium">Amount</th>
+                <th className="table-cell font-medium">Method</th>
+                <th className="table-cell font-medium">Status</th>
+                <th className="table-cell font-medium">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -72,27 +76,27 @@ export default function AdminAllPaymentsPage() {
                 const customer = payment.customerId as any;
 
                 return (
-                  <tr key={payment._id} className="border-b last:border-0">
-                    <td className="py-3 font-medium">
+                  <tr key={payment._id} className="table-row">
+                    <td className="table-cell font-medium text-gray-800">
                       {company?.name || "—"}
                     </td>
-                    <td className="py-3">
+                    <td className="table-cell text-gray-700">
                       {customer?.firstName} {customer?.lastName}
                     </td>
-                    <td className="py-3 font-medium">
+                    <td className="table-cell font-medium text-emerald-600">
                       {formatPrice(payment.amount)}
                     </td>
-                    <td className="py-3 capitalize">
+                    <td className="table-cell capitalize text-gray-600">
                       {payment.method.replace("_", " ")}
                     </td>
-                    <td className="py-3">
+                    <td className="table-cell">
                       <span
                         className={`badge ${getStatusColor(payment.status)}`}
                       >
                         {capitalize(payment.status)}
                       </span>
                     </td>
-                    <td className="py-3 text-gray-500">
+                    <td className="table-cell text-gray-500">
                       {formatDate(payment.createdAt)}
                     </td>
                   </tr>

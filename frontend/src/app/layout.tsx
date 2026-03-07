@@ -9,8 +9,8 @@ import { AuthProvider } from "@/lib/auth";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SurfBook - Surf Company Booking System",
-  description: "SaaS booking system for surf companies",
+  title: "SurfBook — Surf Camp Booking System",
+  description: "Modern booking platform built for surf camps and ocean lifestyle businesses.",
 };
 
 export default function RootLayout({
@@ -19,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className="scroll-smooth">
+      <body className="font-sans">
         {/* AuthProvider gives all pages access to login state */}
         <AuthProvider>{children}</AuthProvider>
       </body>

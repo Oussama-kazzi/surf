@@ -55,27 +55,35 @@ export default function AdminCompaniesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">All Companies</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">All Companies</h1>
+          <p className="page-subtitle">Manage all registered surf companies</p>
+        </div>
+      </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading companies...</p>
+        <div className="flex items-center gap-3 py-12">
+          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <span className="loading-text">Loading companies...</span>
+        </div>
       ) : companies.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="text-4xl mb-4">🏢</div>
-          <p className="text-gray-500">No companies registered yet.</p>
+        <div className="empty-state">
+          <div className="empty-state-icon">🏢</div>
+          <p className="empty-state-text">No companies registered yet.</p>
         </div>
       ) : (
-        <div className="card overflow-x-auto">
+        <div className="table-container">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="pb-3 font-medium">Company</th>
-                <th className="pb-3 font-medium">Owner</th>
-                <th className="pb-3 font-medium">Plan</th>
-                <th className="pb-3 font-medium">Sub. Status</th>
-                <th className="pb-3 font-medium">Active</th>
-                <th className="pb-3 font-medium">Created</th>
-                <th className="pb-3 font-medium">Actions</th>
+              <tr className="table-header">
+                <th className="table-cell font-medium">Company</th>
+                <th className="table-cell font-medium">Owner</th>
+                <th className="table-cell font-medium">Plan</th>
+                <th className="table-cell font-medium">Sub. Status</th>
+                <th className="table-cell font-medium">Active</th>
+                <th className="table-cell font-medium">Created</th>
+                <th className="table-cell font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -83,26 +91,26 @@ export default function AdminCompaniesPage() {
                 const owner = company.ownerId as any;
 
                 return (
-                  <tr key={company._id} className="border-b last:border-0">
-                    <td className="py-3">
+                  <tr key={company._id} className="table-row">
+                    <td className="table-cell">
                       <div>
-                        <p className="font-medium">{company.name}</p>
+                        <p className="font-medium text-gray-800">{company.name}</p>
                         <p className="text-gray-400 text-xs">/{company.slug}</p>
                       </div>
                     </td>
-                    <td className="py-3">
-                      {owner?.firstName} {owner?.lastName}
+                    <td className="table-cell">
+                      <span className="text-gray-700">{owner?.firstName} {owner?.lastName}</span>
                       <br />
                       <span className="text-gray-400 text-xs">
                         {owner?.email}
                       </span>
                     </td>
-                    <td className="py-3">
-                      <span className="badge bg-blue-100 text-blue-800 capitalize">
+                    <td className="table-cell">
+                      <span className="badge bg-blue-50 text-blue-700 capitalize">
                         {company.subscription?.plan || "none"}
                       </span>
                     </td>
-                    <td className="py-3">
+                    <td className="table-cell">
                       <span
                         className={`badge ${getStatusColor(
                           company.subscription?.status || "inactive"
@@ -111,7 +119,7 @@ export default function AdminCompaniesPage() {
                         {capitalize(company.subscription?.status || "none")}
                       </span>
                     </td>
-                    <td className="py-3">
+                    <td className="table-cell">
                       <span
                         className={`badge ${getStatusColor(
                           company.isActive ? "active" : "inactive"
@@ -120,30 +128,28 @@ export default function AdminCompaniesPage() {
                         {company.isActive ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="py-3 text-gray-500">
+                    <td className="table-cell text-gray-500">
                       {formatDate(company.createdAt)}
                     </td>
-                    <td className="py-3">
-                      <div className="flex flex-col gap-1">
-                        {/* Toggle company active/inactive */}
+                    <td className="table-cell">
+                      <div className="flex flex-col gap-1.5">
                         <button
                           onClick={() => toggleCompany(company._id)}
-                          className={`text-xs ${
+                          className={`text-xs font-medium transition-colors ${
                             company.isActive
-                              ? "text-red-600 hover:underline"
-                              : "text-green-600 hover:underline"
+                              ? "text-red-500 hover:text-red-700"
+                              : "text-emerald-600 hover:text-emerald-700"
                           }`}
                         >
                           {company.isActive ? "Deactivate" : "Activate"}
                         </button>
 
-                        {/* Subscription actions */}
                         {company.subscription?.status === "expired" && (
                           <button
                             onClick={() =>
                               updateSubscription(company._id, "active")
                             }
-                            className="text-xs text-blue-600 hover:underline"
+                            className="text-xs font-medium text-ocean-600 hover:text-ocean-700 transition-colors"
                           >
                             Reactivate Sub.
                           </button>
@@ -154,7 +160,7 @@ export default function AdminCompaniesPage() {
                             onClick={() =>
                               updateSubscription(company._id, "expired")
                             }
-                            className="text-xs text-orange-600 hover:underline"
+                            className="text-xs font-medium text-amber-600 hover:text-amber-700 transition-colors"
                           >
                             Suspend Sub.
                           </button>

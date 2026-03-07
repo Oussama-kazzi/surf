@@ -117,8 +117,11 @@ export default function RoomsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Rooms</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Rooms</h1>
+          <p className="page-subtitle">Manage accommodation inventory</p>
+        </div>
         {canEdit && (
           <button onClick={openCreateForm} className="btn-primary">
             + Add Room
@@ -130,16 +133,14 @@ export default function RoomsPage() {
           ROOM FORM (Create/Edit)
           ================================ */}
       {showForm && (
-        <div className="card mb-6">
-          <h2 className="text-lg font-semibold mb-4">
+        <div className="form-card">
+          <h2 className="text-section-title text-gray-900 mb-5">
             {editingRoom ? "Edit Room" : "New Room"}
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="form-grid">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Room Name
-              </label>
+              <label className="label">Room Name</label>
               <input
                 type="text"
                 className="input"
@@ -150,9 +151,7 @@ export default function RoomsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Type
-              </label>
+              <label className="label">Type</label>
               <select
                 className="input"
                 value={form.type}
@@ -169,9 +168,7 @@ export default function RoomsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Capacity (max guests)
-              </label>
+              <label className="label">Capacity (max guests)</label>
               <input
                 type="number"
                 className="input"
@@ -184,9 +181,7 @@ export default function RoomsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price per Night ($)
-              </label>
+              <label className="label">Price per Night ($)</label>
               <input
                 type="number"
                 className="input"
@@ -203,9 +198,7 @@ export default function RoomsPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
+              <label className="label">Description</label>
               <textarea
                 className="input"
                 rows={2}
@@ -218,9 +211,7 @@ export default function RoomsPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amenities (comma-separated)
-              </label>
+              <label className="label">Amenities (comma-separated)</label>
               <input
                 type="text"
                 className="input"
@@ -233,7 +224,7 @@ export default function RoomsPage() {
             </div>
           </div>
 
-          <div className="flex gap-3 mt-4">
+          <div className="form-actions">
             <button onClick={handleSave} className="btn-primary">
               {editingRoom ? "Save Changes" : "Create Room"}
             </button>
@@ -251,20 +242,23 @@ export default function RoomsPage() {
           ROOMS LIST
           ================================ */}
       {loading ? (
-        <p className="text-gray-500">Loading rooms...</p>
+        <div className="flex items-center gap-3 py-12">
+          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <span className="loading-text">Loading rooms...</span>
+        </div>
       ) : rooms.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="text-4xl mb-4">🏠</div>
-          <p className="text-gray-500">No rooms yet. Add your first room!</p>
+        <div className="empty-state">
+          <div className="empty-state-icon">🏠</div>
+          <p className="empty-state-text">No rooms yet. Add your first room!</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {rooms.map((room) => (
-            <div key={room._id} className="card">
+            <div key={room._id} className="card-hover group">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-semibold text-lg">{room.name}</h3>
-                  <p className="text-gray-500 text-sm capitalize">
+                  <h3 className="text-card-title text-gray-900">{room.name}</h3>
+                  <p className="text-gray-400 text-sm capitalize mt-0.5">
                     {room.type} · Up to {room.capacity} guests
                   </p>
                 </div>
@@ -272,15 +266,15 @@ export default function RoomsPage() {
                   <p className="text-xl font-bold text-ocean-600">
                     {formatPrice(room.pricePerNight)}
                   </p>
-                  <p className="text-gray-400 text-xs">per night</p>
+                  <p className="text-gray-400 text-xs">/night</p>
                 </div>
               </div>
 
-              <p className="text-gray-600 text-sm mt-2">{room.description}</p>
+              <p className="text-gray-500 text-sm mt-3 line-clamp-2">{room.description}</p>
 
               {/* Amenities */}
               {room.amenities.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-3">
+                <div className="flex flex-wrap gap-1.5 mt-3">
                   {room.amenities.map((amenity) => (
                     <span
                       key={amenity}
@@ -297,8 +291,8 @@ export default function RoomsPage() {
                 <span
                   className={`badge ${
                     room.isActive
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
+                      ? "bg-emerald-50 text-emerald-700"
+                      : "bg-red-50 text-red-700"
                   }`}
                 >
                   {room.isActive ? "Active" : "Inactive"}
@@ -307,17 +301,17 @@ export default function RoomsPage() {
 
               {/* Edit/Delete buttons */}
               {canEdit && (
-                <div className="flex gap-2 mt-4 pt-4 border-t">
+                <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
                   <button
                     onClick={() => openEditForm(room)}
-                    className="text-sm text-ocean-600 hover:underline"
+                    className="text-sm font-medium text-ocean-600 hover:text-ocean-800 transition-colors"
                   >
                     Edit
                   </button>
                   {user?.role === "admin" && (
                     <button
                       onClick={() => handleDelete(room._id)}
-                      className="text-sm text-red-600 hover:underline"
+                      className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
                     >
                       Delete
                     </button>

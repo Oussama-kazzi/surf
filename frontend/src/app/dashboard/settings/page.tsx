@@ -74,48 +74,52 @@ export default function SettingsPage() {
   }
 
   if (loading) {
-    return <p className="text-gray-500">Loading settings...</p>;
+    return (
+      <div className="flex items-center gap-3 py-12">
+        <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <span className="loading-text">Loading settings...</span>
+      </div>
+    );
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Company Settings</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Company Settings</h1>
+          <p className="page-subtitle">Update your company information</p>
+        </div>
+      </div>
 
       {/* Success/Error message */}
       {message && (
         <div
-          className={`px-4 py-3 rounded-lg mb-4 text-sm ${
-            message.includes("success")
-              ? "bg-green-50 text-green-600"
-              : "bg-red-50 text-red-600"
-          }`}
+          className={message.includes("success") ? "alert-success" : "alert-error"}
         >
           {message}
         </div>
       )}
 
-      <div className="card">
+      <div className="form-card">
         {/* Booking URL */}
         {company && (
-          <div className="mb-6 p-4 bg-ocean-50 rounded-lg">
+          <div className="mb-6 p-4 bg-ocean-50 rounded-xl border border-ocean-100">
             <p className="text-sm text-gray-600">
               Your booking page URL:
             </p>
-            <p className="font-mono text-ocean-700 font-medium">
+            <p className="font-mono text-ocean-700 font-medium mt-1">
               {typeof window !== "undefined" ? window.location.origin : ""}/book/
               {company.slug}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-400 mt-1">
               Share this link with your customers so they can make bookings.
             </p>
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="form-grid">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Company Name
-            </label>
+            <label className="label">Company Name</label>
             <input
               type="text"
               className="input"
@@ -125,9 +129,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+            <label className="label">Email</label>
             <input
               type="email"
               className="input"
@@ -137,9 +139,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone
-            </label>
+            <label className="label">Phone</label>
             <input
               type="tel"
               className="input"
@@ -149,9 +149,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Website
-            </label>
+            <label className="label">Website</label>
             <input
               type="url"
               className="input"
@@ -161,9 +159,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              City
-            </label>
+            <label className="label">City</label>
             <input
               type="text"
               className="input"
@@ -173,9 +169,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Country
-            </label>
+            <label className="label">Country</label>
             <input
               type="text"
               className="input"
@@ -185,9 +179,7 @@ export default function SettingsPage() {
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Address
-            </label>
+            <label className="label">Address</label>
             <input
               type="text"
               className="input"
@@ -197,9 +189,7 @@ export default function SettingsPage() {
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
+            <label className="label">Description</label>
             <textarea
               className="input"
               rows={3}

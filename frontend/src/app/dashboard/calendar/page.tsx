@@ -112,23 +112,28 @@ export default function CalendarPage() {
     totalSlots > 0 ? Math.round((bookedSlots / totalSlots) * 100) : 0;
 
   if (loading) {
-    return <p className="text-gray-500">Loading calendar...</p>;
+    return (
+      <div className="flex items-center gap-3 py-12">
+        <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <span className="loading-text">Loading calendar...</span>
+      </div>
+    );
   }
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold">Room Calendar</h1>
-          <p className="text-gray-500">
-            Occupancy rate:{" "}
+          <h1 className="page-title">Room Calendar</h1>
+          <p className="page-subtitle">
+            Occupancy:{" "}
             <span
               className={`font-bold ${
                 occupancyRate > 80
-                  ? "text-green-600"
+                  ? "text-emerald-600"
                   : occupancyRate > 50
-                  ? "text-yellow-600"
-                  : "text-red-600"
+                  ? "text-amber-500"
+                  : "text-red-500"
               }`}
             >
               {occupancyRate}%
@@ -157,22 +162,22 @@ export default function CalendarPage() {
       </div>
 
       {/* Legend */}
-      <div className="flex gap-4 mb-4 text-sm">
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-green-100 border border-green-300"></div>
-          <span className="text-gray-600">Available</span>
+      <div className="flex flex-wrap gap-4 mb-5 text-sm">
+        <div className="flex items-center gap-1.5">
+          <div className="w-4 h-4 rounded-md bg-emerald-50 border border-emerald-200"></div>
+          <span className="text-gray-500">Available</span>
         </div>
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-ocean-200 border border-ocean-400"></div>
-          <span className="text-gray-600">Confirmed</span>
+        <div className="flex items-center gap-1.5">
+          <div className="w-4 h-4 rounded-md bg-ocean-100 border border-ocean-300"></div>
+          <span className="text-gray-500">Confirmed</span>
         </div>
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-yellow-200 border border-yellow-400"></div>
-          <span className="text-gray-600">Pending</span>
+        <div className="flex items-center gap-1.5">
+          <div className="w-4 h-4 rounded-md bg-amber-100 border border-amber-300"></div>
+          <span className="text-gray-500">Pending</span>
         </div>
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-purple-200 border border-purple-400"></div>
-          <span className="text-gray-600">Completed</span>
+        <div className="flex items-center gap-1.5">
+          <div className="w-4 h-4 rounded-md bg-purple-100 border border-purple-300"></div>
+          <span className="text-gray-500">Completed</span>
         </div>
       </div>
 
@@ -181,7 +186,7 @@ export default function CalendarPage() {
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr>
-              <th className="text-left p-2 border-b border-r bg-gray-50 sticky left-0 z-10 min-w-[140px]">
+              <th className="text-left p-2 border-b border-r border-gray-100 bg-sand-50 sticky left-0 z-10 min-w-[140px]">
                 Room
               </th>
               {dates.map((date) => {
@@ -192,11 +197,11 @@ export default function CalendarPage() {
                 return (
                   <th
                     key={date.toISOString()}
-                    className={`p-2 border-b text-center min-w-[80px] ${
+                    className={`p-2 border-b border-gray-100 text-center min-w-[80px] ${
                       isToday
                         ? "bg-ocean-50 font-bold"
                         : isWeekend
-                        ? "bg-gray-50"
+                        ? "bg-sand-50"
                         : ""
                     }`}
                   >
@@ -217,9 +222,9 @@ export default function CalendarPage() {
           <tbody>
             {rooms.map((room) => (
               <tr key={room._id}>
-                <td className="p-2 border-b border-r bg-white sticky left-0 z-10">
-                  <div className="font-medium">{room.name}</div>
-                  <div className="text-xs text-gray-500 capitalize">
+                <td className="p-2 border-b border-r border-gray-100 bg-white sticky left-0 z-10">
+                  <div className="font-medium text-gray-800">{room.name}</div>
+                  <div className="text-xs text-gray-400 capitalize">
                     {room.type} · {formatPrice(room.pricePerNight)}/night
                   </div>
                 </td>
@@ -228,7 +233,7 @@ export default function CalendarPage() {
                   const isToday =
                     date.toDateString() === new Date().toDateString();
 
-                  let bgColor = "bg-green-50 hover:bg-green-100";
+                  let bgColor = "bg-emerald-50 hover:bg-emerald-100";
                   let label = "";
                   let title = "Available";
 
@@ -243,7 +248,7 @@ export default function CalendarPage() {
                         bgColor = "bg-ocean-100";
                         break;
                       case "pending":
-                        bgColor = "bg-yellow-100";
+                        bgColor = "bg-amber-100";
                         break;
                       case "completed":
                         bgColor = "bg-purple-100";
@@ -269,7 +274,7 @@ export default function CalendarPage() {
                   return (
                     <td
                       key={date.toISOString()}
-                      className={`p-1 border-b text-center cursor-default ${bgColor} ${
+                      className={`p-1 border-b border-gray-50 text-center cursor-default rounded-sm ${bgColor} ${
                         isToday ? "ring-2 ring-inset ring-ocean-400" : ""
                       }`}
                       title={title}
@@ -289,9 +294,9 @@ export default function CalendarPage() {
       </div>
 
       {rooms.length === 0 && (
-        <div className="card text-center py-12 mt-4">
-          <div className="text-4xl mb-4">🏠</div>
-          <p className="text-gray-500">No rooms found. Create rooms first.</p>
+        <div className="empty-state mt-4">
+          <div className="empty-state-icon">🏠</div>
+          <p className="empty-state-text">No rooms found. Create rooms first.</p>
         </div>
       )}
     </div>

@@ -149,12 +149,10 @@ export default function SessionsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold">Sessions</h1>
-          <p className="text-gray-500">
-            Schedule time slots for your activities.
-          </p>
+          <h1 className="page-title">Sessions</h1>
+          <p className="page-subtitle">Schedule time slots for your activities</p>
         </div>
         {canManage && (
           <button
@@ -171,19 +169,13 @@ export default function SessionsPage() {
       </div>
 
       {/* Error */}
-      {error && (
-        <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert-error">{error}</div>}
 
       {/* Filters */}
       <div className="card mb-6">
-        <div className="flex gap-4 items-end">
+        <div className="flex flex-wrap gap-4 items-end">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Activity
-            </label>
+            <label className="label">Activity</label>
             <select
               className="input"
               value={filterActivity}
@@ -198,9 +190,7 @@ export default function SessionsPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Date
-            </label>
+            <label className="label">Date</label>
             <input
               type="date"
               className="input"
@@ -214,7 +204,7 @@ export default function SessionsPage() {
                 setFilterActivity("");
                 setFilterDate("");
               }}
-              className="text-sm text-ocean-600 hover:underline pb-2"
+              className="text-sm font-medium text-ocean-600 hover:text-ocean-800 transition-colors pb-2"
             >
               Clear Filters
             </button>
@@ -224,17 +214,15 @@ export default function SessionsPage() {
 
       {/* Create / Edit Form */}
       {showForm && canManage && (
-        <div className="card mb-6">
-          <h2 className="text-lg font-semibold mb-4">
+        <div className="form-card">
+          <h2 className="text-section-title text-gray-900 mb-5">
             {editingId ? "Edit Session" : "New Session"}
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {!editingId && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Activity *
-                </label>
+                <label className="label">Activity *</label>
                 <select
                   className="input"
                   value={form.activityId}
@@ -252,9 +240,7 @@ export default function SessionsPage() {
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date *
-              </label>
+              <label className="label">Date *</label>
               <input
                 type="date"
                 className="input"
@@ -263,9 +249,7 @@ export default function SessionsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start Time *
-              </label>
+              <label className="label">Start Time *</label>
               <input
                 type="time"
                 className="input"
@@ -276,9 +260,7 @@ export default function SessionsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                End Time *
-              </label>
+              <label className="label">End Time *</label>
               <input
                 type="time"
                 className="input"
@@ -287,9 +269,7 @@ export default function SessionsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Capacity
-              </label>
+              <label className="label">Capacity</label>
               <input
                 type="number"
                 className="input"
@@ -302,7 +282,7 @@ export default function SessionsPage() {
             </div>
           </div>
 
-          <div className="flex gap-3 mt-4">
+          <div className="form-actions">
             <button onClick={handleSubmit} className="btn-primary">
               {editingId ? "Update Session" : "Create Session"}
             </button>
@@ -315,26 +295,27 @@ export default function SessionsPage() {
 
       {/* Sessions List */}
       {loading ? (
-        <p className="text-gray-500">Loading sessions...</p>
+        <div className="flex items-center gap-3 py-12">
+          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <span className="loading-text">Loading sessions...</span>
+        </div>
       ) : sessions.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="text-4xl mb-4">📅</div>
-          <p className="text-gray-500">
-            No sessions scheduled. Create your first one!
-          </p>
+        <div className="empty-state">
+          <div className="empty-state-icon">📅</div>
+          <p className="empty-state-text">No sessions scheduled. Create your first one!</p>
         </div>
       ) : (
-        <div className="card overflow-x-auto">
+        <div className="table-container">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="pb-3 font-medium">Activity</th>
-                <th className="pb-3 font-medium">Date</th>
-                <th className="pb-3 font-medium">Time</th>
-                <th className="pb-3 font-medium">Capacity</th>
-                <th className="pb-3 font-medium">Booked</th>
+              <tr className="border-b border-gray-100">
+                <th className="table-header">Activity</th>
+                <th className="table-header">Date</th>
+                <th className="table-header">Time</th>
+                <th className="table-header">Capacity</th>
+                <th className="table-header">Booked</th>
                 {canManage && (
-                  <th className="pb-3 font-medium">Actions</th>
+                  <th className="table-header">Actions</th>
                 )}
               </tr>
             </thead>
@@ -344,28 +325,25 @@ export default function SessionsPage() {
                 const isFull = spotsLeft <= 0;
 
                 return (
-                  <tr
-                    key={session._id}
-                    className="border-b last:border-0"
-                  >
-                    <td className="py-3 font-medium">
+                  <tr key={session._id} className="table-row">
+                    <td className="table-cell font-medium text-gray-800">
                       {getActivityName(session)}
                     </td>
-                    <td className="py-3">
+                    <td className="table-cell text-gray-500">
                       {formatDate(session.date)}
                     </td>
-                    <td className="py-3">
+                    <td className="table-cell text-gray-500">
                       {session.startTime} – {session.endTime}
                     </td>
-                    <td className="py-3">{session.capacity}</td>
-                    <td className="py-3">
+                    <td className="table-cell text-gray-500">{session.capacity}</td>
+                    <td className="table-cell">
                       <span
                         className={`badge ${
                           isFull
-                            ? "bg-red-100 text-red-800"
+                            ? "bg-red-50 text-red-700"
                             : spotsLeft <= 2
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-green-100 text-green-800"
+                            ? "bg-amber-50 text-amber-700"
+                            : "bg-emerald-50 text-emerald-700"
                         }`}
                       >
                         {session.bookedCount}/{session.capacity}
@@ -373,17 +351,17 @@ export default function SessionsPage() {
                       </span>
                     </td>
                     {canManage && (
-                      <td className="py-3">
-                        <div className="flex gap-2">
+                      <td className="table-cell">
+                        <div className="flex gap-3">
                           <button
                             onClick={() => startEdit(session)}
-                            className="text-sm text-ocean-600 hover:underline"
+                            className="text-sm font-medium text-ocean-600 hover:text-ocean-800 transition-colors"
                           >
                             Edit
                           </button>
                           <button
                             onClick={() => handleDelete(session._id)}
-                            className="text-sm text-red-600 hover:underline"
+                            className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
                           >
                             Delete
                           </button>

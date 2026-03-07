@@ -141,7 +141,12 @@ export default function DashboardPage() {
   }
 
   if (loading) {
-    return <p className="text-gray-500">Loading dashboard...</p>;
+    return (
+      <div className="flex items-center gap-3 py-12">
+        <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <span className="loading-text">Loading dashboard...</span>
+      </div>
+    );
   }
 
   // ================================
@@ -150,43 +155,47 @@ export default function DashboardPage() {
   if (isSuperAdmin && analytics) {
     return (
       <div>
-        <h1 className="text-2xl font-bold mb-6">Platform Analytics</h1>
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">Platform Analytics</h1>
+            <p className="page-subtitle">Overview of all companies and revenue</p>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-          <div className="card">
-            <p className="text-gray-500 text-sm">Total Companies</p>
-            <p className="text-3xl font-bold mt-1">{analytics.totalCompanies}</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+          <div className="stat-card">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Companies</p>
+            <p className="text-3xl font-bold mt-2 text-gray-900">{analytics.totalCompanies}</p>
           </div>
-          <div className="card">
-            <p className="text-gray-500 text-sm">Total Bookings</p>
-            <p className="text-3xl font-bold mt-1">{analytics.totalBookings}</p>
+          <div className="stat-card">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Bookings</p>
+            <p className="text-3xl font-bold mt-2 text-gray-900">{analytics.totalBookings}</p>
           </div>
-          <div className="card">
-            <p className="text-gray-500 text-sm">Total Customers</p>
-            <p className="text-3xl font-bold mt-1">{analytics.totalCustomers}</p>
+          <div className="stat-card">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Customers</p>
+            <p className="text-3xl font-bold mt-2 text-gray-900">{analytics.totalCustomers}</p>
           </div>
-          <div className="card">
-            <p className="text-gray-500 text-sm">Booking Revenue</p>
-            <p className="text-3xl font-bold mt-1 text-green-600">
+          <div className="stat-card">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Booking Revenue</p>
+            <p className="text-3xl font-bold mt-2 text-emerald-600">
               {formatPrice(analytics.totalRevenue)}
             </p>
           </div>
-          {/* Subscription revenue from real payments */}
-          <div className="card">
-            <p className="text-gray-500 text-sm">Active Subscriptions</p>
-            <p className="text-3xl font-bold mt-1 text-ocean-600">
+          <div className="stat-card">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active Subs</p>
+            <p className="text-3xl font-bold mt-2 text-ocean-600">
               {analytics.activeSubscriptions}
             </p>
           </div>
-          <div className="card">
-            <p className="text-gray-500 text-sm">Total Sub. Revenue</p>
-            <p className="text-3xl font-bold mt-1 text-purple-600">
+          <div className="stat-card">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Sub. Revenue</p>
+            <p className="text-3xl font-bold mt-2 text-purple-600">
               {formatPrice(analytics.totalSubscriptionRevenue)}
             </p>
           </div>
-          <div className="card">
-            <p className="text-gray-500 text-sm">This Month Sub. Revenue</p>
-            <p className="text-3xl font-bold mt-1 text-indigo-600">
+          <div className="stat-card">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">This Month Subs</p>
+            <p className="text-3xl font-bold mt-2 text-indigo-600">
               {formatPrice(analytics.monthlySubscriptionRevenue)}
             </p>
           </div>
@@ -200,108 +209,132 @@ export default function DashboardPage() {
   // ================================
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">Welcome back — here&apos;s your overview</p>
+        </div>
+      </div>
 
       {/* Stats Cards - Row 1: Core metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-        <div className="card">
-          <p className="text-gray-500 text-sm">Total Bookings</p>
-          <p className="text-3xl font-bold mt-1">{stats.totalBookings}</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Bookings</p>
+            <span className="text-lg opacity-60">📅</span>
+          </div>
+          <p className="text-3xl font-bold mt-2 text-gray-900">{stats.totalBookings}</p>
         </div>
-        <div className="card">
-          <p className="text-gray-500 text-sm">Pending</p>
-          <p className="text-3xl font-bold mt-1 text-yellow-600">
-            {stats.pendingBookings}
-          </p>
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Pending</p>
+            <span className="text-lg opacity-60">⏳</span>
+          </div>
+          <p className="text-3xl font-bold mt-2 text-amber-500">{stats.pendingBookings}</p>
         </div>
-        <div className="card">
-          <p className="text-gray-500 text-sm">Customers</p>
-          <p className="text-3xl font-bold mt-1">{stats.totalCustomers}</p>
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Customers</p>
+            <span className="text-lg opacity-60">👥</span>
+          </div>
+          <p className="text-3xl font-bold mt-2 text-gray-900">{stats.totalCustomers}</p>
         </div>
-        <div className="card">
-          <p className="text-gray-500 text-sm">Revenue</p>
-          <p className="text-3xl font-bold mt-1 text-green-600">
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Revenue</p>
+            <span className="text-lg opacity-60">💰</span>
+          </div>
+          <p className="text-3xl font-bold mt-2 text-emerald-600">
             {formatPrice(stats.totalRevenue)}
           </p>
         </div>
       </div>
 
-      {/* Stats Cards - Row 2: Occupancy & Activities */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="card">
-          <p className="text-gray-500 text-sm">Today&apos;s Occupancy</p>
+      {/* Stats Cards - Row 2 */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Occupancy</p>
+            <span className="text-lg opacity-60">🏠</span>
+          </div>
           <p
-            className={`text-3xl font-bold mt-1 ${
+            className={`text-3xl font-bold mt-2 ${
               stats.occupancyRate > 80
-                ? "text-green-600"
+                ? "text-emerald-600"
                 : stats.occupancyRate > 50
-                ? "text-yellow-600"
-                : "text-red-600"
+                ? "text-amber-500"
+                : "text-red-500"
             }`}
           >
             {stats.occupancyRate}%
           </p>
-          <p className="text-xs text-gray-400 mt-1">
-            of {stats.totalRooms} rooms
+          <p className="text-[11px] text-gray-400 mt-1">
+            of {stats.totalRooms} rooms · today
           </p>
         </div>
-        <div className="card">
-          <p className="text-gray-500 text-sm">Rooms</p>
-          <p className="text-3xl font-bold mt-1">{stats.totalRooms}</p>
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Rooms</p>
+            <span className="text-lg opacity-60">🛏️</span>
+          </div>
+          <p className="text-3xl font-bold mt-2 text-gray-900">{stats.totalRooms}</p>
         </div>
-        <div className="card">
-          <p className="text-gray-500 text-sm">Activities</p>
-          <p className="text-3xl font-bold mt-1 text-ocean-600">
-            {stats.totalActivities}
-          </p>
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Activities</p>
+            <span className="text-lg opacity-60">🏄</span>
+          </div>
+          <p className="text-3xl font-bold mt-2 text-ocean-600">{stats.totalActivities}</p>
         </div>
-        <div className="card">
-          <p className="text-gray-500 text-sm">Bookings w/ Activities</p>
-          <p className="text-3xl font-bold mt-1 text-purple-600">
-            {stats.activityBookings}
-          </p>
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">w/ Activities</p>
+            <span className="text-lg opacity-60">✨</span>
+          </div>
+          <p className="text-3xl font-bold mt-2 text-purple-600">{stats.activityBookings}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upcoming Arrivals */}
         <div className="card">
-          <h2 className="text-lg font-semibold mb-4">
-            🛬 Upcoming Arrivals{" "}
-            <span className="text-sm font-normal text-gray-400">
-              (next 7 days)
-            </span>
-          </h2>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-section-title text-gray-900">Upcoming Arrivals</h2>
+            <span className="badge bg-ocean-50 text-ocean-700">Next 7 days</span>
+          </div>
 
           {upcomingArrivals.length === 0 ? (
-            <p className="text-gray-500">No upcoming arrivals.</p>
+            <p className="text-sm text-gray-400 py-4">No upcoming arrivals.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {upcomingArrivals.map((booking) => {
                 const customer = booking.customerId as any;
                 const room = booking.roomId as any;
                 return (
                   <div
                     key={booking._id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    className="flex items-center justify-between p-3 rounded-xl bg-sand-50 hover:bg-sand-100 transition-colors"
                   >
-                    <div>
-                      <p className="font-medium text-sm">
-                        {customer?.firstName} {customer?.lastName}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {room?.name || "—"} · {booking.numberOfGuests} guest
-                        {booking.numberOfGuests !== 1 ? "s" : ""}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-ocean-100 text-ocean-700 flex items-center justify-center text-xs font-bold">
+                        {customer?.firstName?.charAt(0)}{customer?.lastName?.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-gray-800">
+                          {customer?.firstName} {customer?.lastName}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {room?.name || "—"} · {booking.numberOfGuests} guest
+                          {booking.numberOfGuests !== 1 ? "s" : ""}
+                        </p>
+                      </div>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-ocean-700">
                         {formatDate(booking.checkIn)}
                       </p>
                       <span
-                        className={`badge text-xs ${getStatusColor(
-                          booking.status
-                        )}`}
+                        className={`badge text-[10px] ${getStatusColor(booking.status)}`}
                       >
                         {capitalize(booking.status)}
                       </span>
@@ -315,50 +348,42 @@ export default function DashboardPage() {
 
         {/* Recent Bookings Table */}
         <div className="card">
-          <h2 className="text-lg font-semibold mb-4">Recent Bookings</h2>
+          <h2 className="text-section-title text-gray-900 mb-5">Recent Bookings</h2>
 
           {recentBookings.length === 0 ? (
-            <p className="text-gray-500">No bookings yet.</p>
+            <p className="text-sm text-gray-400 py-4">No bookings yet.</p>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto -mx-6">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-gray-500 border-b">
-                    <th className="pb-3 font-medium">Customer</th>
-                    <th className="pb-3 font-medium">Room</th>
-                    <th className="pb-3 font-medium">Check-in</th>
-                    <th className="pb-3 font-medium">Status</th>
-                    <th className="pb-3 font-medium">Total</th>
+                  <tr className="border-b border-gray-100">
+                    <th className="table-header px-6 pb-3">Customer</th>
+                    <th className="table-header px-6 pb-3">Room</th>
+                    <th className="table-header px-6 pb-3">Check-in</th>
+                    <th className="table-header px-6 pb-3">Status</th>
+                    <th className="table-header px-6 pb-3 text-right">Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recentBookings.map((booking) => {
-                    // The populated fields come as objects
                     const customer = booking.customerId as any;
                     const room = booking.roomId as any;
 
                     return (
-                      <tr
-                        key={booking._id}
-                        className="border-b last:border-0"
-                      >
-                        <td className="py-3">
+                      <tr key={booking._id} className="table-row">
+                        <td className="table-cell font-medium">
                           {customer?.firstName} {customer?.lastName}
                         </td>
-                        <td className="py-3">{room?.name || "—"}</td>
-                        <td className="py-3">
+                        <td className="table-cell text-gray-500">{room?.name || "—"}</td>
+                        <td className="table-cell text-gray-500">
                           {formatDate(booking.checkIn)}
                         </td>
-                        <td className="py-3">
-                          <span
-                            className={`badge ${getStatusColor(
-                              booking.status
-                            )}`}
-                          >
+                        <td className="table-cell">
+                          <span className={`badge ${getStatusColor(booking.status)}`}>
                             {capitalize(booking.status)}
                           </span>
                         </td>
-                        <td className="py-3 font-medium">
+                        <td className="table-cell text-right font-semibold">
                           {formatPrice(booking.totalPrice)}
                         </td>
                       </tr>

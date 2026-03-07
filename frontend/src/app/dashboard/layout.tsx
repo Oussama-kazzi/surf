@@ -90,27 +90,27 @@ export default function DashboardLayout({
 
   // Navigation items for company users (admin, manager, staff)
   const companyNavItems = [
-    { label: "Overview", href: "/dashboard", icon: "📊" },
-    { label: "Calendar", href: "/dashboard/calendar", icon: "🗓️" },
-    { label: "Bookings", href: "/dashboard/bookings", icon: "📅" },
-    { label: "Rooms", href: "/dashboard/rooms", icon: "🏠" },
-    { label: "Packages", href: "/dashboard/packages", icon: "🏄" },
-    { label: "Activities", href: "/dashboard/activities", icon: "🏄‍♂️" },
-    { label: "Sessions", href: "/dashboard/sessions", icon: "⏰" },
-    { label: "Customers", href: "/dashboard/customers", icon: "👥" },
-    { label: "Payments", href: "/dashboard/payments", icon: "💳" },
-    { label: "Subscription", href: "/dashboard/subscription", icon: "💎" },
-    { label: "Team", href: "/dashboard/team", icon: "👤" },
-    { label: "Settings", href: "/dashboard/settings", icon: "⚙️" },
+    { label: "Overview", href: "/dashboard", icon: "📊", section: "" },
+    { label: "Calendar", href: "/dashboard/calendar", icon: "🗓️", section: "" },
+    { label: "Bookings", href: "/dashboard/bookings", icon: "📅", section: "manage" },
+    { label: "Rooms", href: "/dashboard/rooms", icon: "🏠", section: "manage" },
+    { label: "Packages", href: "/dashboard/packages", icon: "🏄", section: "manage" },
+    { label: "Activities", href: "/dashboard/activities", icon: "🏄‍♂️", section: "manage" },
+    { label: "Sessions", href: "/dashboard/sessions", icon: "⏰", section: "manage" },
+    { label: "Customers", href: "/dashboard/customers", icon: "👥", section: "people" },
+    { label: "Team", href: "/dashboard/team", icon: "👤", section: "people" },
+    { label: "Payments", href: "/dashboard/payments", icon: "💳", section: "billing" },
+    { label: "Subscription", href: "/dashboard/subscription", icon: "💎", section: "billing" },
+    { label: "Settings", href: "/dashboard/settings", icon: "⚙️", section: "billing" },
   ];
 
   // Navigation items for super admin (platform owner)
   const superAdminNavItems = [
-    { label: "Analytics", href: "/dashboard", icon: "📊" },
-    { label: "Companies", href: "/dashboard/companies", icon: "🏢" },
-    { label: "Subscriptions", href: "/dashboard/subscriptions", icon: "💎" },
-    { label: "All Bookings", href: "/dashboard/all-bookings", icon: "📅" },
-    { label: "All Payments", href: "/dashboard/all-payments", icon: "💳" },
+    { label: "Analytics", href: "/dashboard", icon: "📊", section: "" },
+    { label: "Companies", href: "/dashboard/companies", icon: "🏢", section: "platform" },
+    { label: "Subscriptions", href: "/dashboard/subscriptions", icon: "💎", section: "platform" },
+    { label: "All Bookings", href: "/dashboard/all-bookings", icon: "📅", section: "platform" },
+    { label: "All Payments", href: "/dashboard/all-payments", icon: "💳", section: "platform" },
   ];
 
   // Choose which nav items to show based on role
@@ -139,63 +139,93 @@ export default function DashboardLayout({
     return true;
   });
 
+  // Group nav items by section for visual separators
+  const sectionLabels: Record<string, string> = {
+    manage: "Manage",
+    people: "People",
+    billing: "Billing",
+    platform: "Platform",
+  };
+
+  // Build sections from filtered items
+  let currentSection = "";
+  const navWithSections = filteredNavItems.map((item) => {
+    const showSection = item.section && item.section !== currentSection;
+    if (item.section) currentSection = item.section;
+    return { ...item, showSectionLabel: showSection ? sectionLabels[item.section] : null };
+  });
+
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-sand-50">
       {/* ================================
           SIDEBAR
           ================================ */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <aside className="w-64 bg-white border-r border-gray-100 shadow-sidebar flex flex-col fixed inset-y-0 left-0 z-30">
         {/* Logo */}
-        <div className="p-6 border-b border-gray-100">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="text-2xl">🏄</span>
-            <span className="text-lg font-bold text-ocean-700">SurfBook</span>
+        <div className="px-6 py-5 border-b border-gray-100">
+          <Link href="/dashboard" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl gradient-ocean flex items-center justify-center text-white text-sm font-bold">
+              S
+            </div>
+            <span className="text-lg font-bold text-gray-900 tracking-tight">
+              SurfBook
+            </span>
           </Link>
           {isSuperAdmin && (
-            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mt-2 inline-block">
+            <span className="text-[10px] font-semibold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mt-2.5 inline-block uppercase tracking-wider">
               Super Admin
             </span>
           )}
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 p-4 space-y-1">
-          {filteredNavItems.map((item) => {
-            // Check if this nav item is the current page
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          {navWithSections.map((item) => {
             const isActive =
               pathname === item.href ||
               (item.href !== "/dashboard" && pathname.startsWith(item.href));
 
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                  isActive
-                    ? "bg-ocean-50 text-ocean-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </Link>
+              <div key={item.href}>
+                {item.showSectionLabel && (
+                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-3 pt-5 pb-2">
+                    {item.showSectionLabel}
+                  </p>
+                )}
+                <Link
+                  href={item.href}
+                  className={`nav-item ${
+                    isActive ? "nav-item-active" : "nav-item-inactive"
+                  }`}
+                >
+                  <span className="text-base leading-none">{item.icon}</span>
+                  <span>{item.label}</span>
+                </Link>
+              </div>
             );
           })}
         </nav>
 
         {/* User Info & Logout */}
-        <div className="p-4 border-t border-gray-100">
-          <div className="mb-3">
-            <p className="text-sm font-medium text-gray-900">
-              {user.firstName} {user.lastName}
-            </p>
-            <p className="text-xs text-gray-500 capitalize">{user.role.replace("_", " ")}</p>
+        <div className="px-4 py-4 border-t border-gray-100">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded-full bg-ocean-100 text-ocean-700 flex items-center justify-center text-sm font-bold">
+              {user.firstName?.charAt(0)}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user.firstName} {user.lastName}
+              </p>
+              <p className="text-[11px] text-gray-400 capitalize">
+                {user.role.replace("_", " ")}
+              </p>
+            </div>
           </div>
           <button
             onClick={logout}
-            className="text-sm text-red-600 hover:text-red-700"
+            className="text-xs font-medium text-gray-400 hover:text-red-600 transition-colors"
           >
-            Log out
+            Sign out
           </button>
         </div>
       </aside>
@@ -203,26 +233,30 @@ export default function DashboardLayout({
       {/* ================================
           MAIN CONTENT
           ================================ */}
-      <main className="flex-1 bg-gray-50">
+      <main className="flex-1 ml-64 min-h-screen">
         {/* Subscription expired banner */}
-        {/* Shows at the top of every dashboard page when subscription is expired */}
         {subscriptionExpired && (
-          <div className="bg-red-500 text-white px-8 py-3 flex items-center justify-between">
-            <div>
-              <span className="font-medium">⚠️ Your subscription has {subscriptionStatus === "canceled" ? "been canceled" : "expired"}.</span>
-              <span className="ml-2 text-red-100">
-                You cannot create new bookings until you renew.
-              </span>
+          <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">⚠️</span>
+              <div>
+                <span className="font-medium">
+                  Your subscription has {subscriptionStatus === "canceled" ? "been canceled" : "expired"}.
+                </span>
+                <span className="ml-2 text-red-100 text-sm">
+                  You cannot create new bookings until you renew.
+                </span>
+              </div>
             </div>
             <Link
               href="/dashboard/subscription"
-              className="bg-white text-red-600 px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-red-50"
+              className="bg-white text-red-600 px-4 py-1.5 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors shadow-sm"
             >
               Renew Now
             </Link>
           </div>
         )}
-        <div className="p-8">{children}</div>
+        <div className="p-8 max-w-7xl">{children}</div>
       </main>
     </div>
   );

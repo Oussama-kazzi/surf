@@ -50,8 +50,11 @@ export default function BookingsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Bookings</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Bookings</h1>
+          <p className="page-subtitle">Manage and track all reservations</p>
+        </div>
 
         {/* Status Filter */}
         <select
@@ -68,27 +71,30 @@ export default function BookingsPage() {
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading bookings...</p>
+        <div className="flex items-center gap-3 py-12">
+          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <span className="loading-text">Loading bookings...</span>
+        </div>
       ) : bookings.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="text-4xl mb-4">📅</div>
-          <p className="text-gray-500">No bookings found.</p>
+        <div className="empty-state">
+          <div className="empty-state-icon">📅</div>
+          <p className="empty-state-text">No bookings found.</p>
         </div>
       ) : (
-        <div className="card overflow-x-auto">
+        <div className="table-container">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="pb-3 font-medium">Customer</th>
-                <th className="pb-3 font-medium">Room</th>
-                <th className="pb-3 font-medium">Check-in</th>
-                <th className="pb-3 font-medium">Check-out</th>
-                <th className="pb-3 font-medium">Nights</th>
-                <th className="pb-3 font-medium">Status</th>
-                <th className="pb-3 font-medium">Payment</th>
-                <th className="pb-3 font-medium">Total</th>
+              <tr className="border-b border-gray-100">
+                <th className="table-header">Customer</th>
+                <th className="table-header">Room</th>
+                <th className="table-header">Check-in</th>
+                <th className="table-header">Check-out</th>
+                <th className="table-header">Nights</th>
+                <th className="table-header">Status</th>
+                <th className="table-header">Payment</th>
+                <th className="table-header">Total</th>
                 {(user?.role === "admin" || user?.role === "manager") && (
-                  <th className="pb-3 font-medium">Actions</th>
+                  <th className="table-header">Actions</th>
                 )}
               </tr>
             </thead>
@@ -98,10 +104,10 @@ export default function BookingsPage() {
                 const room = booking.roomId as any;
 
                 return (
-                  <tr key={booking._id} className="border-b last:border-0">
-                    <td className="py-3">
+                  <tr key={booking._id} className="table-row">
+                    <td className="table-cell">
                       <div>
-                        <p className="font-medium">
+                        <p className="font-medium text-gray-800">
                           {customer?.firstName} {customer?.lastName}
                         </p>
                         <p className="text-gray-400 text-xs">
@@ -109,29 +115,29 @@ export default function BookingsPage() {
                         </p>
                       </div>
                     </td>
-                    <td className="py-3">{room?.name || "—"}</td>
-                    <td className="py-3">{formatDate(booking.checkIn)}</td>
-                    <td className="py-3">{formatDate(booking.checkOut)}</td>
-                    <td className="py-3">{booking.numberOfNights}</td>
-                    <td className="py-3">
+                    <td className="table-cell text-gray-500">{room?.name || "—"}</td>
+                    <td className="table-cell text-gray-500">{formatDate(booking.checkIn)}</td>
+                    <td className="table-cell text-gray-500">{formatDate(booking.checkOut)}</td>
+                    <td className="table-cell text-gray-500">{booking.numberOfNights}</td>
+                    <td className="table-cell">
                       <span className={`badge ${getStatusColor(booking.status)}`}>
                         {capitalize(booking.status)}
                       </span>
                     </td>
-                    <td className="py-3">
+                    <td className="table-cell">
                       <span
                         className={`badge ${getStatusColor(booking.paymentStatus)}`}
                       >
                         {capitalize(booking.paymentStatus)}
                       </span>
                     </td>
-                    <td className="py-3 font-medium">
+                    <td className="table-cell font-semibold">
                       {formatPrice(booking.totalPrice)}
                     </td>
                     {(user?.role === "admin" || user?.role === "manager") && (
-                      <td className="py-3">
+                      <td className="table-cell">
                         <select
-                          className="text-xs border rounded px-2 py-1"
+                          className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-ocean-300"
                           value={booking.status}
                           onChange={(e) =>
                             updateStatus(booking._id, e.target.value)

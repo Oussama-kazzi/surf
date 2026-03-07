@@ -296,10 +296,13 @@ export default function BookingPage() {
   // ================================
   if (loading && !company) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ocean-50 to-white">
         <div className="text-center">
-          <div className="text-4xl mb-4">🏄</div>
-          <p className="text-gray-500">Loading...</p>
+          <div className="text-5xl mb-4 animate-bounce">🏄</div>
+          <div className="flex items-center gap-3 justify-center">
+            <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+            <span className="loading-text">Loading surf camp...</span>
+          </div>
         </div>
       </div>
     );
@@ -307,11 +310,11 @@ export default function BookingPage() {
 
   if (!company) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4">😕</div>
-          <h1 className="text-2xl font-bold mb-2">Company Not Found</h1>
-          <p className="text-gray-500">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ocean-50 to-white">
+        <div className="card max-w-md w-full text-center">
+          <div className="text-5xl mb-4">😕</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Company Not Found</h1>
+          <p className="text-gray-400">
             The surf company you&apos;re looking for doesn&apos;t exist.
           </p>
         </div>
@@ -326,16 +329,18 @@ export default function BookingPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ocean-50 to-white px-4">
         <div className="card max-w-lg w-full text-center">
-          <div className="text-6xl mb-4">🎉</div>
+          <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+            <span className="text-4xl">🎉</span>
+          </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Booking Confirmed!
           </h1>
-          <p className="text-gray-600 mb-6">
-            Your booking at <strong>{company.name}</strong> has been submitted.
+          <p className="text-gray-500 mb-6">
+            Your booking at <strong className="text-gray-700">{company.name}</strong> has been submitted.
             You&apos;ll receive a confirmation email at{" "}
-            <strong>{customerInfo.email}</strong>.
+            <strong className="text-gray-700">{customerInfo.email}</strong>.
           </p>
-          <div className="bg-ocean-50 rounded-lg p-4 text-left space-y-2">
+          <div className="bg-ocean-50 rounded-xl p-5 text-left space-y-2.5 border border-ocean-100">
             <p>
               <span className="text-gray-500">Room:</span>{" "}
               <strong>{selectedRoom?.name}</strong>
@@ -393,11 +398,12 @@ export default function BookingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-ocean-50 to-white">
       {/* Header */}
-      <div className="bg-ocean-700 text-white py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <h1 className="text-3xl font-bold">{company.name}</h1>
-          <p className="text-ocean-200 mt-1">{company.description}</p>
-          <p className="text-ocean-300 text-sm mt-2">
+      <div className="gradient-ocean text-white py-10 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 1440 320\'%3E%3Cpath fill=\'%23ffffff\' d=\'M0,160L48,176C96,192,192,224,288,218.7C384,213,480,171,576,149.3C672,128,768,128,864,149.3C960,171,1056,213,1152,218.7C1248,224,1344,192,1392,176L1440,160L1440,320L0,320Z\'/%3E%3C/svg%3E")' }}></div>
+        <div className="max-w-4xl mx-auto px-4 relative">
+          <h1 className="text-3xl font-bold tracking-tight">{company.name}</h1>
+          <p className="text-white/70 mt-1">{company.description}</p>
+          <p className="text-white/50 text-sm mt-2 flex items-center gap-1">
             📍 {company.city}, {company.country}
           </p>
         </div>
@@ -405,7 +411,7 @@ export default function BookingPage() {
 
       {/* Step Indicator */}
       <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="flex items-center gap-1 mb-8 overflow-x-auto">
+        <div className="flex items-center gap-1 mb-8 overflow-x-auto pb-2">
           {stepLabels.map((label, index) => {
             const stepNum = index + 1;
             const isSkipped =
@@ -413,14 +419,14 @@ export default function BookingPage() {
             if (isSkipped) return null;
 
             return (
-              <div key={label} className="flex items-center gap-1">
+              <div key={label} className="flex items-center gap-1.5">
                 <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all shadow-sm ${
                     step > stepNum
-                      ? "bg-green-500 text-white"
+                      ? "bg-emerald-500 text-white"
                       : step === stepNum
-                      ? "bg-ocean-600 text-white"
-                      : "bg-gray-200 text-gray-500"
+                      ? "bg-ocean-600 text-white ring-4 ring-ocean-100"
+                      : "bg-gray-100 text-gray-400 border border-gray-200"
                   }`}
                 >
                   {step > stepNum ? "✓" : stepNum}
@@ -428,14 +434,18 @@ export default function BookingPage() {
                 <span
                   className={`text-xs whitespace-nowrap ${
                     step === stepNum
-                      ? "font-medium text-gray-900"
-                      : "text-gray-500"
+                      ? "font-semibold text-gray-900"
+                      : step > stepNum
+                      ? "text-emerald-600 font-medium"
+                      : "text-gray-400"
                   }`}
                 >
                   {label}
                 </span>
                 {index < stepLabels.length - 1 && (
-                  <div className="w-6 h-px bg-gray-300 mx-0.5"></div>
+                  <div className={`w-8 h-0.5 mx-0.5 rounded-full ${
+                    step > stepNum + 1 ? "bg-emerald-300" : step > stepNum ? "bg-ocean-200" : "bg-gray-200"
+                  }`}></div>
                 )}
               </div>
             );
@@ -444,7 +454,7 @@ export default function BookingPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
+          <div className="alert-error">
             {error}
           </div>
         )}
@@ -452,12 +462,13 @@ export default function BookingPage() {
         {/* STEP 1: SELECT DATES */}
         {step === 1 && (
           <div className="card">
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-section-title text-gray-900 mb-1">
               When would you like to stay?
             </h2>
-            <div className="grid md:grid-cols-3 gap-4">
+            <p className="text-gray-400 text-sm mb-5">Select your dates and number of guests</p>
+            <div className="form-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="label">
                   Check-in Date
                 </label>
                 <input
@@ -469,7 +480,7 @@ export default function BookingPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="label">
                   Check-out Date
                 </label>
                 <input
@@ -481,7 +492,7 @@ export default function BookingPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="label">
                   Guests
                 </label>
                 <select
@@ -517,20 +528,20 @@ export default function BookingPage() {
         {/* STEP 2: SELECT ROOM */}
         {step === 2 && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Choose a Room</h2>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-section-title text-gray-900">Choose a Room</h2>
               <button
                 onClick={() => goToStep(1)}
-                className="text-ocean-600 hover:underline text-sm"
+                className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
               >
                 ← Change dates
               </button>
             </div>
 
             {rooms.length === 0 ? (
-              <div className="card text-center py-12">
-                <div className="text-4xl mb-4">😢</div>
-                <p className="text-gray-600">
+              <div className="empty-state">
+                <div className="empty-state-icon">😢</div>
+                <p className="empty-state-text">
                   No rooms available for your selected dates.
                 </p>
                 <button onClick={() => goToStep(1)} className="btn-primary mt-4">
@@ -542,17 +553,17 @@ export default function BookingPage() {
                 {rooms.map((room) => (
                   <div
                     key={room._id}
-                    className={`card cursor-pointer transition-all hover:shadow-md ${
+                    className={`card cursor-pointer transition-all hover:shadow-card-hover ${
                       selectedRoom?._id === room._id
-                        ? "ring-2 ring-ocean-500"
-                        : ""
+                        ? "ring-2 ring-ocean-500 bg-ocean-50/30"
+                        : "hover:border-ocean-200"
                     }`}
                     onClick={() => setSelectedRoom(room)}
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-semibold text-lg">{room.name}</h3>
-                        <p className="text-gray-500 text-sm capitalize">
+                        <h3 className="font-semibold text-lg text-gray-900">{room.name}</h3>
+                        <p className="text-gray-400 text-sm capitalize">
                           {room.type} · Up to {room.capacity} guests
                         </p>
                       </div>
@@ -563,11 +574,11 @@ export default function BookingPage() {
                         <p className="text-gray-400 text-xs">per night</p>
                       </div>
                     </div>
-                    <p className="text-gray-600 text-sm mt-2">
+                    <p className="text-gray-500 text-sm mt-2">
                       {room.description}
                     </p>
                     {room.amenities.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-3">
+                      <div className="flex flex-wrap gap-1.5 mt-3">
                         {room.amenities.map((amenity) => (
                           <span
                             key={amenity}
@@ -584,10 +595,10 @@ export default function BookingPage() {
             )}
 
             {selectedRoom && (
-              <div className="mt-6 flex justify-between items-center">
+              <div className="mt-6 flex justify-between items-center bg-sand-50 rounded-xl p-4 border border-sand-100">
                 <p className="text-gray-600">
                   Selected:{" "}
-                  <strong>
+                  <strong className="text-gray-800">
                     {selectedRoom.name} —{" "}
                     {formatPrice(
                       selectedRoom.pricePerNight *
@@ -607,14 +618,14 @@ export default function BookingPage() {
         {/* STEP 3: SELECT PACKAGE (OPTIONAL) */}
         {step === 3 && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-section-title text-gray-900">
                 Add a Surf Package{" "}
                 <span className="text-gray-400 text-sm font-normal">(optional)</span>
               </h2>
               <button
                 onClick={() => goToStep(2)}
-                className="text-ocean-600 hover:underline text-sm"
+                className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
               >
                 ← Change room
               </button>
@@ -624,10 +635,10 @@ export default function BookingPage() {
               {packages.map((pkg) => (
                 <div
                   key={pkg._id}
-                  className={`card cursor-pointer transition-all hover:shadow-md ${
+                  className={`card cursor-pointer transition-all hover:shadow-card-hover ${
                     selectedPackage?._id === pkg._id
-                      ? "ring-2 ring-ocean-500"
-                      : ""
+                      ? "ring-2 ring-ocean-500 bg-ocean-50/30"
+                      : "hover:border-ocean-200"
                   }`}
                   onClick={() =>
                     setSelectedPackage(
@@ -637,8 +648,8 @@ export default function BookingPage() {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-semibold text-lg">{pkg.name}</h3>
-                      <p className="text-gray-500 text-sm">
+                      <h3 className="font-semibold text-lg text-gray-900">{pkg.name}</h3>
+                      <p className="text-gray-400 text-sm">
                         {pkg.durationDays} days ·{" "}
                         <span className="capitalize">{pkg.difficulty}</span>
                       </p>
@@ -650,15 +661,15 @@ export default function BookingPage() {
                       <p className="text-gray-400 text-xs">per person</p>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm mt-2">{pkg.description}</p>
+                  <p className="text-gray-500 text-sm mt-2">{pkg.description}</p>
                   {pkg.includes.length > 0 && (
-                    <ul className="mt-3 space-y-1">
+                    <ul className="mt-3 space-y-1.5">
                       {pkg.includes.map((item) => (
                         <li
                           key={item}
                           className="text-sm text-gray-600 flex items-center gap-2"
                         >
-                          <span className="text-green-500">✓</span> {item}
+                          <span className="text-emerald-500">✓</span> {item}
                         </li>
                       ))}
                     </ul>
@@ -667,7 +678,7 @@ export default function BookingPage() {
               ))}
             </div>
 
-            <div className="mt-6 flex justify-between items-center">
+            <div className="mt-6 flex justify-between items-center bg-sand-50 rounded-xl p-4 border border-sand-100">
               <p className="text-gray-600">
                 Running total:{" "}
                 <strong className="text-ocean-600">
@@ -684,22 +695,23 @@ export default function BookingPage() {
         {/* STEP 4: SELECT ACTIVITIES (OPTIONAL, MULTI-SELECT) */}
         {step === 4 && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-section-title text-gray-900">
                 Add Activities{" "}
                 <span className="text-gray-400 text-sm font-normal">(optional)</span>
               </h2>
               <button
                 onClick={() => goToStep(3)}
-                className="text-ocean-600 hover:underline text-sm"
+                className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
               >
                 ← Back to packages
               </button>
             </div>
 
             {activities.length === 0 ? (
-              <div className="card text-center py-8">
-                <p className="text-gray-500">No activities available at the moment.</p>
+              <div className="empty-state">
+                <div className="empty-state-icon">🏄</div>
+                <p className="empty-state-text">No activities available at the moment.</p>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 gap-4">
@@ -710,15 +722,15 @@ export default function BookingPage() {
                   return (
                     <div
                       key={activity._id}
-                      className={`card cursor-pointer transition-all hover:shadow-md ${
-                        isSelected ? "ring-2 ring-ocean-500" : ""
+                      className={`card cursor-pointer transition-all hover:shadow-card-hover ${
+                        isSelected ? "ring-2 ring-ocean-500 bg-ocean-50/30" : "hover:border-ocean-200"
                       }`}
                       onClick={() => toggleActivity(activity)}
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex items-start gap-3">
                           <div
-                            className={`w-5 h-5 rounded border-2 mt-1 flex items-center justify-center ${
+                            className={`w-5 h-5 rounded-md border-2 mt-1 flex items-center justify-center transition-colors ${
                               isSelected
                                 ? "bg-ocean-600 border-ocean-600 text-white"
                                 : "border-gray-300"
@@ -727,8 +739,8 @@ export default function BookingPage() {
                             {isSelected && <span className="text-xs">✓</span>}
                           </div>
                           <div>
-                            <h3 className="font-semibold text-lg">{activity.name}</h3>
-                            <p className="text-gray-500 text-sm">
+                            <h3 className="font-semibold text-lg text-gray-900">{activity.name}</h3>
+                            <p className="text-gray-400 text-sm">
                               ⏱ {activity.duration} min · 👥 Max {activity.capacity}
                             </p>
                           </div>
@@ -738,7 +750,7 @@ export default function BookingPage() {
                         </p>
                       </div>
                       {activity.description && (
-                        <p className="text-gray-600 text-sm mt-2 ml-8">
+                        <p className="text-gray-500 text-sm mt-2 ml-8">
                           {activity.description}
                         </p>
                       )}
@@ -748,7 +760,7 @@ export default function BookingPage() {
               </div>
             )}
 
-            <div className="mt-6 flex justify-between items-center">
+            <div className="mt-6 flex justify-between items-center bg-sand-50 rounded-xl p-4 border border-sand-100">
               <p className="text-gray-600">
                 {selectedActivities.length > 0 ? (
                   <>
@@ -775,36 +787,39 @@ export default function BookingPage() {
         {/* STEP 5: SELECT SESSIONS FOR EACH ACTIVITY */}
         {step === 5 && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Choose Time Slots</h2>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-section-title text-gray-900">Choose Time Slots</h2>
               <button
                 onClick={() => goToStep(4)}
-                className="text-ocean-600 hover:underline text-sm"
+                className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
               >
                 ← Back to activities
               </button>
             </div>
 
             {loading ? (
-              <p className="text-gray-500">Loading available sessions...</p>
+              <div className="flex items-center gap-3 py-12">
+                <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+                <span className="loading-text">Loading available sessions...</span>
+              </div>
             ) : (
               <div className="space-y-6">
                 {selectedActivities.map((sa) => {
                   const sessions = activitySessions[sa.activity._id] || [];
                   return (
                     <div key={sa.activity._id} className="card">
-                      <h3 className="font-semibold text-lg mb-1">
+                      <h3 className="font-semibold text-lg text-gray-900 mb-1">
                         {sa.activity.name}
                       </h3>
-                      <p className="text-gray-500 text-sm mb-3">
+                      <p className="text-gray-400 text-sm mb-3">
                         Select a time slot below
                       </p>
 
                       {sessions.length === 0 ? (
-                        <p className="text-yellow-600 text-sm">
+                        <div className="alert-warning">
                           No sessions available during your stay dates. You can go
                           back and remove this activity.
-                        </p>
+                        </div>
                       ) : (
                         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
                           {sessions.map((session) => {
@@ -819,27 +834,27 @@ export default function BookingPage() {
                                 onClick={() =>
                                   selectSession(sa.activity._id, session)
                                 }
-                                className={`p-3 rounded-lg border text-left transition-all ${
+                                className={`p-3.5 rounded-xl border-2 text-left transition-all ${
                                   isSelected
-                                    ? "border-ocean-500 bg-ocean-50 ring-2 ring-ocean-500"
+                                    ? "border-ocean-500 bg-ocean-50 shadow-md"
                                     : isFull
-                                    ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed"
-                                    : "border-gray-200 hover:border-ocean-300 cursor-pointer"
+                                    ? "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
+                                    : "border-gray-100 hover:border-ocean-300 hover:shadow-sm cursor-pointer"
                                 }`}
                               >
-                                <p className="font-medium text-sm">
+                                <p className="font-medium text-sm text-gray-600">
                                   {formatDate(session.date)}
                                 </p>
                                 <p className="text-ocean-600 font-semibold">
                                   {session.startTime} – {session.endTime}
                                 </p>
                                 <p
-                                  className={`text-xs mt-1 ${
+                                  className={`text-xs mt-1 font-medium ${
                                     isFull
                                       ? "text-red-500"
                                       : spotsLeft <= 2
-                                      ? "text-yellow-600"
-                                      : "text-green-600"
+                                      ? "text-amber-600"
+                                      : "text-emerald-600"
                                   }`}
                                 >
                                   {isFull
@@ -857,7 +872,7 @@ export default function BookingPage() {
               </div>
             )}
 
-            <div className="mt-6 flex justify-between items-center">
+            <div className="mt-6 flex justify-between items-center bg-sand-50 rounded-xl p-4 border border-sand-100">
               <p className="text-gray-600">
                 Running total:{" "}
                 <strong className="text-ocean-600">
@@ -875,13 +890,13 @@ export default function BookingPage() {
         {step === 6 && (
           <div className="grid md:grid-cols-3 gap-6">
             <div className="md:col-span-2 card">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">Your Details</h2>
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-section-title text-gray-900">Your Details</h2>
                 <button
                   onClick={() =>
                     goToStep(selectedActivities.length > 0 ? 5 : 4)
                   }
-                  className="text-ocean-600 hover:underline text-sm"
+                  className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
                 >
                   ← Back
                 </button>
@@ -890,7 +905,7 @@ export default function BookingPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="label">
                       First Name *
                     </label>
                     <input
@@ -907,7 +922,7 @@ export default function BookingPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="label">
                       Last Name *
                     </label>
                     <input
@@ -926,7 +941,7 @@ export default function BookingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="label">
                     Email *
                   </label>
                   <input
@@ -944,7 +959,7 @@ export default function BookingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="label">
                     Phone
                   </label>
                   <input
@@ -961,7 +976,7 @@ export default function BookingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="label">
                     Special Requests
                   </label>
                   <textarea
@@ -988,32 +1003,32 @@ export default function BookingPage() {
             </div>
 
             {/* Mini Summary Sidebar */}
-            <div className="card h-fit">
-              <h3 className="font-semibold mb-4">Summary</h3>
-              <div className="space-y-2 text-sm">
+            <div className="card h-fit bg-sand-50 border border-sand-100">
+              <h3 className="font-semibold text-gray-900 mb-4">Summary</h3>
+              <div className="space-y-2.5 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Room</span>
-                  <span>{selectedRoom?.name}</span>
+                  <span className="text-gray-400">Room</span>
+                  <span className="font-medium text-gray-700">{selectedRoom?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Nights</span>
-                  <span>{calculateNights(checkIn, checkOut)}</span>
+                  <span className="text-gray-400">Nights</span>
+                  <span className="font-medium text-gray-700">{calculateNights(checkIn, checkOut)}</span>
                 </div>
                 {selectedPackage && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Package</span>
-                    <span>{selectedPackage.name}</span>
+                    <span className="text-gray-400">Package</span>
+                    <span className="font-medium text-gray-700">{selectedPackage.name}</span>
                   </div>
                 )}
                 {selectedActivities.length > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Activities</span>
-                    <span>{selectedActivities.length}</span>
+                    <span className="text-gray-400">Activities</span>
+                    <span className="font-medium text-gray-700">{selectedActivities.length}</span>
                   </div>
                 )}
-                <hr />
+                <hr className="border-sand-200" />
                 <div className="flex justify-between font-bold text-lg">
-                  <span>Total</span>
+                  <span className="text-gray-900">Total</span>
                   <span className="text-ocean-600">
                     {formatPrice(getTotalPrice())}
                   </span>
@@ -1027,11 +1042,11 @@ export default function BookingPage() {
         {step === 7 && (
           <div className="grid md:grid-cols-3 gap-6">
             <div className="md:col-span-2 card">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">Review Your Booking</h2>
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-section-title text-gray-900">Review Your Booking</h2>
                 <button
                   onClick={() => goToStep(6)}
-                  className="text-ocean-600 hover:underline text-sm"
+                  className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
                 >
                   ← Edit details
                 </button>
@@ -1151,37 +1166,37 @@ export default function BookingPage() {
             </div>
 
             {/* Price Breakdown Sidebar */}
-            <div className="card h-fit">
-              <h3 className="font-semibold mb-4">Price Breakdown</h3>
+            <div className="card h-fit bg-sand-50 border border-sand-100">
+              <h3 className="font-semibold text-gray-900 mb-4">Price Breakdown</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">
+                  <span className="text-gray-400">
                     Room ({calculateNights(checkIn, checkOut)} nights)
                   </span>
-                  <span>{formatPrice(getRoomTotal())}</span>
+                  <span className="font-medium text-gray-700">{formatPrice(getRoomTotal())}</span>
                 </div>
 
                 {selectedPackage && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">
+                    <span className="text-gray-400">
                       Package ({guests} guest{guests !== 1 ? "s" : ""})
                     </span>
-                    <span>{formatPrice(getPackageTotal())}</span>
+                    <span className="font-medium text-gray-700">{formatPrice(getPackageTotal())}</span>
                   </div>
                 )}
 
                 {selectedActivities.length > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">
+                    <span className="text-gray-400">
                       Activities ({selectedActivities.length})
                     </span>
-                    <span>{formatPrice(getActivitiesTotal())}</span>
+                    <span className="font-medium text-gray-700">{formatPrice(getActivitiesTotal())}</span>
                   </div>
                 )}
 
-                <hr />
+                <hr className="border-sand-200" />
                 <div className="flex justify-between text-lg font-bold">
-                  <span>Total</span>
+                  <span className="text-gray-900">Total</span>
                   <span className="text-ocean-600">
                     {formatPrice(getTotalPrice())}
                   </span>

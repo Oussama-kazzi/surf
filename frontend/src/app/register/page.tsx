@@ -55,18 +55,20 @@ export default function RegisterPage() {
       <div className="card max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <span className="text-4xl">🏄</span>
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">
+          <div className="w-16 h-16 gradient-ocean rounded-2xl flex items-center justify-center mx-auto shadow-lg">
+            <span className="text-3xl">🏄</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mt-4">
             Create your SurfBook Account
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-400 mt-1">
             Set up your surf company in minutes.
           </p>
         </div>
 
         {/* Error message */}
         {error && (
-          <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
+          <div className="alert-error">
             {error}
           </div>
         )}
@@ -76,7 +78,7 @@ export default function RegisterPage() {
           {/* Name fields — side by side */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 First Name
               </label>
               <input
@@ -90,7 +92,7 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 Last Name
               </label>
               <input
@@ -106,7 +108,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="label">
               Company Name
             </label>
             <input
@@ -121,7 +123,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="label">
               Email
             </label>
             <input
@@ -136,7 +138,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="label">
               Password
             </label>
             <input
@@ -161,9 +163,9 @@ export default function RegisterPage() {
         </form>
 
         {/* Login link */}
-        <p className="text-center text-gray-500 text-sm mt-6">
+        <p className="text-center text-gray-400 text-sm mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-ocean-600 hover:underline">
+          <Link href="/login" className="text-ocean-600 hover:text-ocean-700 font-medium">
             Log in
           </Link>
         </p>

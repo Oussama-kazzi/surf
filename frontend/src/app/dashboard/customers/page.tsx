@@ -42,8 +42,11 @@ export default function CustomersPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Customers</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Customers</h1>
+          <p className="page-subtitle">View and search your guest database</p>
+        </div>
         <input
           type="text"
           className="input w-auto"
@@ -54,36 +57,39 @@ export default function CustomersPage() {
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading customers...</p>
+        <div className="flex items-center gap-3 py-12">
+          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <span className="loading-text">Loading customers...</span>
+        </div>
       ) : filteredCustomers.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="text-4xl mb-4">👥</div>
-          <p className="text-gray-500">
+        <div className="empty-state">
+          <div className="empty-state-icon">👥</div>
+          <p className="empty-state-text">
             {search ? "No customers match your search." : "No customers yet."}
           </p>
         </div>
       ) : (
-        <div className="card overflow-x-auto">
+        <div className="table-container">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="pb-3 font-medium">Name</th>
-                <th className="pb-3 font-medium">Email</th>
-                <th className="pb-3 font-medium">Phone</th>
-                <th className="pb-3 font-medium">Joined</th>
+              <tr className="border-b border-gray-100">
+                <th className="table-header">Name</th>
+                <th className="table-header">Email</th>
+                <th className="table-header">Phone</th>
+                <th className="table-header">Joined</th>
               </tr>
             </thead>
             <tbody>
               {filteredCustomers.map((customer) => (
-                <tr key={customer._id} className="border-b last:border-0">
-                  <td className="py-3 font-medium">
+                <tr key={customer._id} className="table-row">
+                  <td className="table-cell font-medium text-gray-800">
                     {customer.firstName} {customer.lastName}
                   </td>
-                  <td className="py-3 text-gray-600">{customer.email}</td>
-                  <td className="py-3 text-gray-600">
+                  <td className="table-cell text-gray-500">{customer.email}</td>
+                  <td className="table-cell text-gray-500">
                     {customer.phone || "—"}
                   </td>
-                  <td className="py-3 text-gray-500">
+                  <td className="table-cell text-gray-400">
                     {formatDate(customer.createdAt)}
                   </td>
                 </tr>

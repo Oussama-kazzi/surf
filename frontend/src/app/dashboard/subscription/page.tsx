@@ -120,10 +120,14 @@ export default function SubscriptionPage() {
 
   // Show loading state
   if (loading) {
-    return <p className="text-gray-500">Loading subscription...</p>;
+    return (
+      <div className="flex items-center gap-3 py-12">
+        <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <span className="loading-text">Loading subscription...</span>
+      </div>
+    );
   }
 
-  // Figure out current status for display
   const isExpired = subscription?.status === "expired";
   const isCanceled = subscription?.status === "canceled";
   const isTrial = subscription?.status === "trial";
@@ -131,90 +135,64 @@ export default function SubscriptionPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Subscription</h1>
-
-      {/* Show success/error messages */}
-      {message && (
-        <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg mb-6">
-          {message}
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Subscription</h1>
+          <p className="page-subtitle">Manage your plan and billing</p>
         </div>
-      )}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6">
-          {error}
-        </div>
-      )}
+      </div>
 
-      {/* ================================
-          CURRENT SUBSCRIPTION STATUS
-          Shows the company's current plan and billing info.
-          ================================ */}
+      {message && <div className="alert-success">{message}</div>}
+      {error && <div className="alert-error">{error}</div>}
+
+      {/* Current Subscription Status */}
       <div className="card mb-8">
-        <h2 className="text-lg font-semibold mb-4">Current Subscription</h2>
+        <h2 className="text-section-title text-gray-900 mb-5">Current Subscription</h2>
 
         {subscription ? (
           <div className="space-y-3">
-            {/* Plan name */}
             <div className="flex justify-between items-center">
-              <span className="text-gray-500">Plan</span>
-              <span className="font-medium capitalize">
+              <span className="text-gray-400 text-sm">Plan</span>
+              <span className="font-medium capitalize text-gray-800">
                 {subscription.plan}
               </span>
             </div>
-
-            {/* Status */}
             <div className="flex justify-between items-center">
-              <span className="text-gray-500">Status</span>
-              <span
-                className={`badge ${getStatusColor(subscription.status)}`}
-              >
+              <span className="text-gray-400 text-sm">Status</span>
+              <span className={`badge ${getStatusColor(subscription.status)}`}>
                 {capitalize(subscription.status)}
               </span>
             </div>
-
-            {/* Monthly price */}
             <div className="flex justify-between items-center">
-              <span className="text-gray-500">Monthly Price</span>
-              <span className="font-medium">
+              <span className="text-gray-400 text-sm">Monthly Price</span>
+              <span className="font-medium text-gray-800">
                 {formatPrice(subscription.pricePerMonth)}/month
               </span>
             </div>
-
-            {/* Start date */}
             <div className="flex justify-between items-center">
-              <span className="text-gray-500">Started</span>
-              <span>{formatDate(subscription.startDate)}</span>
+              <span className="text-gray-400 text-sm">Started</span>
+              <span className="text-gray-600">{formatDate(subscription.startDate)}</span>
             </div>
-
-            {/* Next billing / expiry date */}
             <div className="flex justify-between items-center">
-              <span className="text-gray-500">
+              <span className="text-gray-400 text-sm">
                 {isExpired ? "Expired On" : isTrial ? "Trial Ends" : "Next Billing"}
               </span>
-              <span className={isExpired ? "text-red-600 font-medium" : ""}>
+              <span className={isExpired ? "text-red-500 font-medium" : "text-gray-600"}>
                 {formatDate(subscription.nextBillingDate)}
               </span>
             </div>
 
-            {/* Action buttons based on status */}
-            <div className="pt-4 border-t flex gap-3">
-              {/* If expired — show renew button */}
+            <div className="pt-4 border-t border-gray-100 flex gap-3">
               {isExpired && (
-                <button
-                  onClick={handleRenew}
-                  disabled={actionLoading}
-                  className="btn-primary"
-                >
+                <button onClick={handleRenew} disabled={actionLoading} className="btn-primary">
                   {actionLoading ? "Processing..." : "Renew Subscription"}
                 </button>
               )}
-
-              {/* If active or trial — show cancel button */}
               {(isActive || isTrial) && (
                 <button
                   onClick={handleCancel}
                   disabled={actionLoading}
-                  className="text-sm text-red-600 hover:underline"
+                  className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
                 >
                   Cancel Subscription
                 </button>
@@ -223,22 +201,15 @@ export default function SubscriptionPage() {
           </div>
         ) : (
           <div className="text-center py-8">
-            <p className="text-gray-500 mb-2">
-              No active subscription found.
-            </p>
-            <p className="text-sm text-gray-400">
-              Choose a plan below to get started.
-            </p>
+            <p className="text-gray-400 mb-2">No active subscription found.</p>
+            <p className="text-sm text-gray-400">Choose a plan below to get started.</p>
           </div>
         )}
       </div>
 
-      {/* ================================
-          EXPIRED / CANCELED WARNING
-          Shows a prominent warning if the subscription is not active.
-          ================================ */}
+      {/* Expired / Canceled Warning */}
       {(isExpired || isCanceled) && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-lg mb-8">
+        <div className="alert-warning mb-8">
           <h3 className="font-bold text-lg mb-2">
             {isExpired
               ? "⚠️ Your Subscription Has Expired"
@@ -249,64 +220,52 @@ export default function SubscriptionPage() {
             Your existing data is safe and accessible.
           </p>
           {isExpired && (
-            <button
-              onClick={handleRenew}
-              disabled={actionLoading}
-              className="btn-primary"
-            >
+            <button onClick={handleRenew} disabled={actionLoading} className="btn-primary">
               {actionLoading ? "Processing..." : "Renew Now"}
             </button>
           )}
         </div>
       )}
 
-      {/* ================================
-          AVAILABLE PLANS
-          Shows all plans with prices and features.
-          Users can click to subscribe or upgrade.
-          ================================ */}
-      <h2 className="text-lg font-semibold mb-4">Available Plans</h2>
+      {/* Available Plans */}
+      <h2 className="text-section-title text-gray-900 mb-5">Available Plans</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map((plan) => {
-          // Check if this is the current plan
           const isCurrentPlan = subscription?.plan === plan.id;
 
           return (
             <div
               key={plan.id}
-              className={`card border-2 ${
+              className={`card border-2 transition-all ${
                 isCurrentPlan
-                  ? "border-ocean-500 bg-ocean-50"
-                  : "border-gray-200 hover:border-ocean-300"
-              } transition-colors`}
+                  ? "border-ocean-500 bg-ocean-50/50 shadow-lg"
+                  : "border-gray-100 hover:border-ocean-200 hover:shadow-card-hover"
+              }`}
             >
-              {/* Plan header */}
-              <div className="text-center mb-4">
-                <h3 className="text-xl font-bold">{plan.name}</h3>
+              <div className="text-center mb-5">
+                <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
                 <div className="mt-2">
-                  <span className="text-3xl font-bold">
+                  <span className="text-3xl font-bold text-ocean-600">
                     {formatPrice(plan.pricePerMonth)}
                   </span>
-                  <span className="text-gray-500">/month</span>
+                  <span className="text-gray-400">/month</span>
                 </div>
               </div>
 
-              {/* Features list */}
-              <ul className="space-y-2 mb-6">
+              <ul className="space-y-2.5 mb-6">
                 {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2 text-sm">
-                    <span className="text-green-500">✓</span>
+                  <li key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                    <span className="text-emerald-500">✓</span>
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
 
-              {/* Subscribe / Current plan button */}
               {isCurrentPlan && (isActive || isTrial) ? (
                 <button
                   disabled
-                  className="w-full py-2 px-4 bg-ocean-100 text-ocean-700 rounded-lg font-medium cursor-default"
+                  className="w-full py-2.5 px-4 bg-ocean-100 text-ocean-700 rounded-xl font-medium cursor-default"
                 >
                   Current Plan
                 </button>
@@ -314,7 +273,7 @@ export default function SubscriptionPage() {
                 <button
                   onClick={() => handleSubscribe(plan.id)}
                   disabled={actionLoading}
-                  className="w-full py-2 px-4 bg-ocean-600 text-white rounded-lg font-medium hover:bg-ocean-700 disabled:opacity-50"
+                  className="w-full py-2.5 px-4 bg-ocean-600 text-white rounded-xl font-medium hover:bg-ocean-700 transition-colors disabled:opacity-50"
                 >
                   {actionLoading
                     ? "Processing..."
@@ -328,7 +287,6 @@ export default function SubscriptionPage() {
         })}
       </div>
 
-      {/* Note about payments */}
       <p className="text-center text-sm text-gray-400 mt-8">
         Payments are simulated in this demo. In production, this would
         integrate with Stripe or another payment provider.

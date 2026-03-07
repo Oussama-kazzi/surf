@@ -47,18 +47,20 @@ export default function LoginPage() {
       <div className="card max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <span className="text-4xl">🏄</span>
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">
+          <div className="w-16 h-16 gradient-ocean rounded-2xl flex items-center justify-center mx-auto shadow-lg">
+            <span className="text-3xl">🏄</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mt-4">
             Log in to SurfBook
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-400 mt-1">
             Welcome back! Enter your credentials.
           </p>
         </div>
 
         {/* Error message */}
         {error && (
-          <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
+          <div className="alert-error">
             {error}
           </div>
         )}
@@ -66,7 +68,7 @@ export default function LoginPage() {
         {/* Login form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="label">
               Email
             </label>
             <input
@@ -80,7 +82,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="label">
               Password
             </label>
             <input
@@ -103,9 +105,9 @@ export default function LoginPage() {
         </form>
 
         {/* Register link */}
-        <p className="text-center text-gray-500 text-sm mt-6">
+        <p className="text-center text-gray-400 text-sm mt-6">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-ocean-600 hover:underline">
+          <Link href="/register" className="text-ocean-600 hover:text-ocean-700 font-medium">
             Sign up
           </Link>
         </p>

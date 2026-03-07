@@ -92,8 +92,11 @@ export default function TeamPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Team Members</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Team Members</h1>
+          <p className="page-subtitle">Manage roles and access for your team</p>
+        </div>
         <button onClick={() => setShowForm(true)} className="btn-primary">
           + Add Member
         </button>
@@ -101,20 +104,14 @@ export default function TeamPage() {
 
       {/* Add Member Form */}
       {showForm && (
-        <form onSubmit={handleAddMember} className="card mb-6">
-          <h2 className="text-lg font-semibold mb-4">Add Team Member</h2>
+        <form onSubmit={handleAddMember} className="form-card">
+          <h2 className="text-section-title text-gray-900 mb-5">Add Team Member</h2>
 
-          {formError && (
-            <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
-              {formError}
-            </div>
-          )}
+          {formError && <div className="alert-error">{formError}</div>}
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="form-grid">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                First Name
-              </label>
+              <label className="label">First Name</label>
               <input
                 type="text"
                 className="input"
@@ -126,9 +123,7 @@ export default function TeamPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Last Name
-              </label>
+              <label className="label">Last Name</label>
               <input
                 type="text"
                 className="input"
@@ -140,9 +135,7 @@ export default function TeamPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
+              <label className="label">Email</label>
               <input
                 type="email"
                 className="input"
@@ -152,9 +145,7 @@ export default function TeamPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
+              <label className="label">Password</label>
               <input
                 type="password"
                 className="input"
@@ -167,9 +158,7 @@ export default function TeamPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Role
-              </label>
+              <label className="label">Role</label>
               <select
                 className="input"
                 value={form.role}
@@ -186,7 +175,7 @@ export default function TeamPage() {
             </div>
           </div>
 
-          <div className="flex gap-3 mt-4">
+          <div className="form-actions">
             <button type="submit" className="btn-primary">
               Add Member
             </button>
@@ -203,40 +192,43 @@ export default function TeamPage() {
 
       {/* Team List */}
       {loading ? (
-        <p className="text-gray-500">Loading team...</p>
+        <div className="flex items-center gap-3 py-12">
+          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <span className="loading-text">Loading team...</span>
+        </div>
       ) : members.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="text-4xl mb-4">👤</div>
-          <p className="text-gray-500">No team members yet.</p>
+        <div className="empty-state">
+          <div className="empty-state-icon">👤</div>
+          <p className="empty-state-text">No team members yet.</p>
         </div>
       ) : (
-        <div className="card overflow-x-auto">
+        <div className="table-container">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="pb-3 font-medium">Name</th>
-                <th className="pb-3 font-medium">Email</th>
-                <th className="pb-3 font-medium">Role</th>
-                <th className="pb-3 font-medium">Status</th>
-                <th className="pb-3 font-medium">Joined</th>
-                <th className="pb-3 font-medium">Actions</th>
+              <tr className="border-b border-gray-100">
+                <th className="table-header">Name</th>
+                <th className="table-header">Email</th>
+                <th className="table-header">Role</th>
+                <th className="table-header">Status</th>
+                <th className="table-header">Joined</th>
+                <th className="table-header">Actions</th>
               </tr>
             </thead>
             <tbody>
               {members.map((member) => (
-                <tr key={member._id} className="border-b last:border-0">
-                  <td className="py-3 font-medium">
+                <tr key={member._id} className="table-row">
+                  <td className="table-cell font-medium text-gray-800">
                     {member.firstName} {member.lastName}
                   </td>
-                  <td className="py-3 text-gray-600">{member.email}</td>
-                  <td className="py-3">
+                  <td className="table-cell text-gray-500">{member.email}</td>
+                  <td className="table-cell">
                     {member.role === "admin" ? (
-                      <span className="badge bg-purple-100 text-purple-800">
+                      <span className="badge bg-purple-50 text-purple-700">
                         Admin
                       </span>
                     ) : (
                       <select
-                        className="text-xs border rounded px-2 py-1"
+                        className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-ocean-300"
                         value={member.role}
                         onChange={(e) =>
                           handleRoleChange(member._id, e.target.value)
@@ -247,26 +239,24 @@ export default function TeamPage() {
                       </select>
                     )}
                   </td>
-                  <td className="py-3">
+                  <td className="table-cell">
                     <span
-                      className={`badge ${getStatusColor(
-                        member.isActive ? "active" : "inactive"
-                      )}`}
+                      className={`badge ${member.isActive ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}
                     >
                       {member.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="py-3 text-gray-500">
+                  <td className="table-cell text-gray-400">
                     {formatDate(member.createdAt)}
                   </td>
-                  <td className="py-3">
+                  <td className="table-cell">
                     {member.role !== "admin" && (
                       <button
                         onClick={() => handleToggleActive(member._id)}
-                        className={`text-xs ${
+                        className={`text-xs font-medium transition-colors ${
                           member.isActive
-                            ? "text-red-600 hover:underline"
-                            : "text-green-600 hover:underline"
+                            ? "text-red-500 hover:text-red-700"
+                            : "text-emerald-600 hover:text-emerald-800"
                         }`}
                       >
                         {member.isActive ? "Deactivate" : "Activate"}

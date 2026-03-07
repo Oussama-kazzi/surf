@@ -71,12 +71,12 @@ export default function PaymentsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold">Payments</h1>
-          <p className="text-gray-500">
+          <h1 className="page-title">Payments</h1>
+          <p className="page-subtitle">
             Total Revenue:{" "}
-            <span className="font-bold text-green-600">
+            <span className="font-bold text-emerald-600">
               {formatPrice(totalRevenue)}
             </span>
           </p>
@@ -90,14 +90,12 @@ export default function PaymentsPage() {
 
       {/* Record Payment Form */}
       {showForm && (
-        <div className="card mb-6">
-          <h2 className="text-lg font-semibold mb-4">Record Payment</h2>
+        <div className="form-card">
+          <h2 className="text-section-title text-gray-900 mb-5">Record Payment</h2>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="form-grid">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Booking
-              </label>
+              <label className="label">Booking</label>
               <select
                 className="input"
                 value={form.bookingId}
@@ -119,9 +117,7 @@ export default function PaymentsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amount ($)
-              </label>
+              <label className="label">Amount ($)</label>
               <input
                 type="number"
                 className="input"
@@ -135,9 +131,7 @@ export default function PaymentsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Method
-              </label>
+              <label className="label">Method</label>
               <select
                 className="input"
                 value={form.method}
@@ -156,9 +150,7 @@ export default function PaymentsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Payment Type
-              </label>
+              <label className="label">Payment Type</label>
               <select
                 className="input"
                 value={form.type}
@@ -177,9 +169,7 @@ export default function PaymentsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notes
-              </label>
+              <label className="label">Notes</label>
               <input
                 type="text"
                 className="input"
@@ -190,7 +180,7 @@ export default function PaymentsPage() {
             </div>
           </div>
 
-          <div className="flex gap-3 mt-4">
+          <div className="form-actions">
             <button onClick={handleRecordPayment} className="btn-primary">
               Record Payment
             </button>
@@ -206,23 +196,26 @@ export default function PaymentsPage() {
 
       {/* Payments List */}
       {loading ? (
-        <p className="text-gray-500">Loading payments...</p>
+        <div className="flex items-center gap-3 py-12">
+          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <span className="loading-text">Loading payments...</span>
+        </div>
       ) : payments.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="text-4xl mb-4">💳</div>
-          <p className="text-gray-500">No payments recorded yet.</p>
+        <div className="empty-state">
+          <div className="empty-state-icon">💳</div>
+          <p className="empty-state-text">No payments recorded yet.</p>
         </div>
       ) : (
-        <div className="card overflow-x-auto">
+        <div className="table-container">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="pb-3 font-medium">Customer</th>
-                <th className="pb-3 font-medium">Amount</th>
-                <th className="pb-3 font-medium">Method</th>
-                <th className="pb-3 font-medium">Type</th>
-                <th className="pb-3 font-medium">Status</th>
-                <th className="pb-3 font-medium">Date</th>
+              <tr className="border-b border-gray-100">
+                <th className="table-header">Customer</th>
+                <th className="table-header">Amount</th>
+                <th className="table-header">Method</th>
+                <th className="table-header">Type</th>
+                <th className="table-header">Status</th>
+                <th className="table-header">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -230,37 +223,37 @@ export default function PaymentsPage() {
                 const customer = payment.customerId as any;
 
                 return (
-                  <tr key={payment._id} className="border-b last:border-0">
-                    <td className="py-3">
+                  <tr key={payment._id} className="table-row">
+                    <td className="table-cell font-medium text-gray-800">
                       {customer?.firstName} {customer?.lastName}
                     </td>
-                    <td className="py-3 font-medium">
+                    <td className="table-cell font-semibold">
                       {formatPrice(payment.amount)}
                     </td>
-                    <td className="py-3 capitalize">
+                    <td className="table-cell text-gray-500 capitalize">
                       {payment.method.replace("_", " ")}
                     </td>
-                    <td className="py-3">
+                    <td className="table-cell">
                       <span className={`badge ${
                         payment.type === "refund"
-                          ? "bg-red-100 text-red-700"
+                          ? "bg-red-50 text-red-700"
                           : payment.type === "deposit"
-                          ? "bg-yellow-100 text-yellow-700"
+                          ? "bg-amber-50 text-amber-700"
                           : payment.type === "remaining"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-green-100 text-green-700"
+                          ? "bg-blue-50 text-blue-700"
+                          : "bg-emerald-50 text-emerald-700"
                       }`}>
                         {capitalize(payment.type || "full")}
                       </span>
                     </td>
-                    <td className="py-3">
+                    <td className="table-cell">
                       <span
                         className={`badge ${getStatusColor(payment.status)}`}
                       >
                         {capitalize(payment.status)}
                       </span>
                     </td>
-                    <td className="py-3 text-gray-500">
+                    <td className="table-cell text-gray-400">
                       {formatDate(payment.createdAt)}
                     </td>
                   </tr>

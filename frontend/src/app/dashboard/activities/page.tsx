@@ -107,12 +107,10 @@ export default function ActivitiesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold">Activities</h1>
-          <p className="text-gray-500">
-            Manage surf activities offered to your guests.
-          </p>
+          <h1 className="page-title">Activities</h1>
+          <p className="page-subtitle">Manage surf activities offered to your guests</p>
         </div>
         {canManage && (
           <button
@@ -128,24 +126,18 @@ export default function ActivitiesPage() {
       </div>
 
       {/* Error */}
-      {error && (
-        <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert-error">{error}</div>}
 
       {/* Create / Edit Form */}
       {showForm && canManage && (
-        <div className="card mb-6">
-          <h2 className="text-lg font-semibold mb-4">
+        <div className="form-card">
+          <h2 className="text-section-title text-gray-900 mb-5">
             {editingId ? "Edit Activity" : "New Activity"}
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="form-grid">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name *
-              </label>
+              <label className="label">Name *</label>
               <input
                 type="text"
                 className="input"
@@ -155,9 +147,7 @@ export default function ActivitiesPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price ($)
-              </label>
+              <label className="label">Price ($)</label>
               <input
                 type="number"
                 className="input"
@@ -170,9 +160,7 @@ export default function ActivitiesPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Duration (minutes)
-              </label>
+              <label className="label">Duration (minutes)</label>
               <input
                 type="number"
                 className="input"
@@ -184,9 +172,7 @@ export default function ActivitiesPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Default Capacity
-              </label>
+              <label className="label">Default Capacity</label>
               <input
                 type="number"
                 className="input"
@@ -198,9 +184,7 @@ export default function ActivitiesPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
+              <label className="label">Description</label>
               <textarea
                 className="input"
                 rows={3}
@@ -213,7 +197,7 @@ export default function ActivitiesPage() {
             </div>
           </div>
 
-          <div className="flex gap-3 mt-4">
+          <div className="form-actions">
             <button onClick={handleSubmit} className="btn-primary">
               {editingId ? "Update Activity" : "Create Activity"}
             </button>
@@ -226,24 +210,27 @@ export default function ActivitiesPage() {
 
       {/* Activities List */}
       {loading ? (
-        <p className="text-gray-500">Loading activities...</p>
+        <div className="flex items-center gap-3 py-12">
+          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <span className="loading-text">Loading activities...</span>
+        </div>
       ) : activities.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="text-4xl mb-4">🏄</div>
-          <p className="text-gray-500">No activities yet. Create your first one!</p>
+        <div className="empty-state">
+          <div className="empty-state-icon">🏄</div>
+          <p className="empty-state-text">No activities yet. Create your first one!</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {activities.map((activity) => (
             <div
               key={activity._id}
-              className={`card ${!activity.isActive ? "opacity-50" : ""}`}
+              className={`card-hover group ${!activity.isActive ? "opacity-50" : ""}`}
             >
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="font-semibold text-lg">{activity.name}</h3>
+                  <h3 className="text-card-title text-gray-900">{activity.name}</h3>
                   {!activity.isActive && (
-                    <span className="badge bg-red-100 text-red-800 text-xs">
+                    <span className="badge bg-red-50 text-red-700 text-xs mt-1">
                       Inactive
                     </span>
                   )}
@@ -253,27 +240,27 @@ export default function ActivitiesPage() {
                 </p>
               </div>
 
-              <p className="text-gray-600 text-sm mb-3">
+              <p className="text-gray-500 text-sm mb-3 line-clamp-2">
                 {activity.description || "No description."}
               </p>
 
-              <div className="flex gap-4 text-sm text-gray-500 mb-4">
+              <div className="flex gap-4 text-sm text-gray-400 mb-4">
                 <span>⏱ {activity.duration} min</span>
                 <span>👥 Max {activity.capacity}</span>
               </div>
 
               {canManage && (
-                <div className="flex gap-2">
+                <div className="flex gap-3 pt-3 border-t border-gray-100">
                   <button
                     onClick={() => startEdit(activity)}
-                    className="text-sm text-ocean-600 hover:underline"
+                    className="text-sm font-medium text-ocean-600 hover:text-ocean-800 transition-colors"
                   >
                     Edit
                   </button>
                   {activity.isActive && (
                     <button
                       onClick={() => handleDelete(activity._id)}
-                      className="text-sm text-red-600 hover:underline"
+                      className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
                     >
                       Deactivate
                     </button>

@@ -114,8 +114,11 @@ export default function PackagesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Surf Packages</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Surf Packages</h1>
+          <p className="page-subtitle">Create and manage your surf experiences</p>
+        </div>
         {canEdit && (
           <button onClick={openCreateForm} className="btn-primary">
             + Add Package
@@ -125,16 +128,14 @@ export default function PackagesPage() {
 
       {/* Package Form */}
       {showForm && (
-        <div className="card mb-6">
-          <h2 className="text-lg font-semibold mb-4">
+        <div className="form-card">
+          <h2 className="text-section-title text-gray-900 mb-5">
             {editingPackage ? "Edit Package" : "New Package"}
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="form-grid">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Package Name
-              </label>
+              <label className="label">Package Name</label>
               <input
                 type="text"
                 className="input"
@@ -145,9 +146,7 @@ export default function PackagesPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Difficulty
-              </label>
+              <label className="label">Difficulty</label>
               <select
                 className="input"
                 value={form.difficulty}
@@ -166,9 +165,7 @@ export default function PackagesPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Duration (days)
-              </label>
+              <label className="label">Duration (days)</label>
               <input
                 type="number"
                 className="input"
@@ -181,9 +178,7 @@ export default function PackagesPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price per Person ($)
-              </label>
+              <label className="label">Price per Person ($)</label>
               <input
                 type="number"
                 className="input"
@@ -200,9 +195,7 @@ export default function PackagesPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Max Participants
-              </label>
+              <label className="label">Max Participants</label>
               <input
                 type="number"
                 className="input"
@@ -218,9 +211,7 @@ export default function PackagesPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
+              <label className="label">Description</label>
               <textarea
                 className="input"
                 rows={2}
@@ -232,9 +223,7 @@ export default function PackagesPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                What&apos;s Included (comma-separated)
-              </label>
+              <label className="label">What&apos;s Included (comma-separated)</label>
               <input
                 type="text"
                 className="input"
@@ -245,7 +234,7 @@ export default function PackagesPage() {
             </div>
           </div>
 
-          <div className="flex gap-3 mt-4">
+          <div className="form-actions">
             <button onClick={handleSave} className="btn-primary">
               {editingPackage ? "Save Changes" : "Create Package"}
             </button>
@@ -261,22 +250,25 @@ export default function PackagesPage() {
 
       {/* Packages List */}
       {loading ? (
-        <p className="text-gray-500">Loading packages...</p>
+        <div className="flex items-center gap-3 py-12">
+          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <span className="loading-text">Loading packages...</span>
+        </div>
       ) : packages.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="text-4xl mb-4">🏄</div>
-          <p className="text-gray-500">
+        <div className="empty-state">
+          <div className="empty-state-icon">🏄</div>
+          <p className="empty-state-text">
             No packages yet. Create your first surf package!
           </p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
           {packages.map((pkg) => (
-            <div key={pkg._id} className="card">
+            <div key={pkg._id} className="card-hover group">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-semibold text-lg">{pkg.name}</h3>
-                  <p className="text-gray-500 text-sm">
+                  <h3 className="text-card-title text-gray-900">{pkg.name}</h3>
+                  <p className="text-gray-400 text-sm mt-0.5">
                     {pkg.durationDays} days ·{" "}
                     <span className="capitalize">{pkg.difficulty}</span> ·
                     Max {pkg.maxParticipants} people
@@ -286,11 +278,11 @@ export default function PackagesPage() {
                   <p className="text-xl font-bold text-ocean-600">
                     {formatPrice(pkg.pricePerPerson)}
                   </p>
-                  <p className="text-gray-400 text-xs">per person</p>
+                  <p className="text-gray-400 text-xs">/person</p>
                 </div>
               </div>
 
-              <p className="text-gray-600 text-sm mt-2">{pkg.description}</p>
+              <p className="text-gray-500 text-sm mt-3 line-clamp-2">{pkg.description}</p>
 
               {pkg.includes.length > 0 && (
                 <ul className="mt-3 space-y-1">
@@ -299,24 +291,24 @@ export default function PackagesPage() {
                       key={item}
                       className="text-sm text-gray-600 flex items-center gap-2"
                     >
-                      <span className="text-green-500">✓</span> {item}
+                      <span className="text-emerald-500">✓</span> {item}
                     </li>
                   ))}
                 </ul>
               )}
 
               {canEdit && (
-                <div className="flex gap-2 mt-4 pt-4 border-t">
+                <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
                   <button
                     onClick={() => openEditForm(pkg)}
-                    className="text-sm text-ocean-600 hover:underline"
+                    className="text-sm font-medium text-ocean-600 hover:text-ocean-800 transition-colors"
                   >
                     Edit
                   </button>
                   {user?.role === "admin" && (
                     <button
                       onClick={() => handleDelete(pkg._id)}
-                      className="text-sm text-red-600 hover:underline"
+                      className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
                     >
                       Delete
                     </button>
