@@ -47,6 +47,25 @@ router.post(
     try {
       const { email, password, firstName, lastName, role } = req.body;
 
+      // Make sure the admin belongs to a company
+      if (!req.user!.companyId) {
+        res.status(400).json({
+          message: "You must be associated with a company to add team members.",
+        });
+        return;
+      }
+
+      // Validate required fields
+      if (!email || !password || !firstName || !lastName || !role) {
+        res.status(400).json({ message: "All fields are required." });
+        return;
+      }
+
+      if (password.length < 6) {
+        res.status(400).json({ message: "Password must be at least 6 characters." });
+        return;
+      }
+
       // Check if email is already taken
       const existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {

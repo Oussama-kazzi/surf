@@ -9,10 +9,12 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
+import { subscriptionApi } from "@/lib/api";
+import { Subscription } from "@/types";
 
 export default function DashboardLayout({
   children,
@@ -23,12 +25,49 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { user, loading, logout } = useAuth();
 
+  // ================================
+  // SUBSCRIPTION EXPIRY CHECK
+  // We check if the company's subscription is expired.
+  // If so, we show a warning banner at the top of every dashboard page.
+  // ================================
+  const [subscriptionExpired, setSubscriptionExpired] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
+
+  const isSuperAdmin = user?.role === "super_admin";
+
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
+
+  useEffect(() => {
+    // Only check subscription for company users (not super admin)
+    if (user && !isSuperAdmin && user.companyId) {
+      checkSubscription();
+    }
+  }, [user, isSuperAdmin]);
+
+  async function checkSubscription() {
+    try {
+      const data = await subscriptionApi.getMine();
+      if (data.subscription) {
+        setSubscriptionStatus(data.subscription.status);
+        if (
+          data.subscription.status === "expired" ||
+          data.subscription.status === "canceled"
+        ) {
+          setSubscriptionExpired(true);
+        }
+      } else {
+        setSubscriptionExpired(true);
+        setSubscriptionStatus("expired");
+      }
+    } catch (err) {
+      console.error("Error checking subscription:", err);
+    }
+  }
 
   // Show loading while checking auth
   if (loading) {
@@ -48,16 +87,19 @@ export default function DashboardLayout({
   // Super admin sees platform management options.
   // Company users see their company management options.
   // ================================
-  const isSuperAdmin = user.role === "super_admin";
 
   // Navigation items for company users (admin, manager, staff)
   const companyNavItems = [
     { label: "Overview", href: "/dashboard", icon: "📊" },
+    { label: "Calendar", href: "/dashboard/calendar", icon: "🗓️" },
     { label: "Bookings", href: "/dashboard/bookings", icon: "📅" },
     { label: "Rooms", href: "/dashboard/rooms", icon: "🏠" },
     { label: "Packages", href: "/dashboard/packages", icon: "🏄" },
+    { label: "Activities", href: "/dashboard/activities", icon: "🏄‍♂️" },
+    { label: "Sessions", href: "/dashboard/sessions", icon: "⏰" },
     { label: "Customers", href: "/dashboard/customers", icon: "👥" },
     { label: "Payments", href: "/dashboard/payments", icon: "💳" },
+    { label: "Subscription", href: "/dashboard/subscription", icon: "💎" },
     { label: "Team", href: "/dashboard/team", icon: "👤" },
     { label: "Settings", href: "/dashboard/settings", icon: "⚙️" },
   ];
@@ -66,6 +108,7 @@ export default function DashboardLayout({
   const superAdminNavItems = [
     { label: "Analytics", href: "/dashboard", icon: "📊" },
     { label: "Companies", href: "/dashboard/companies", icon: "🏢" },
+    { label: "Subscriptions", href: "/dashboard/subscriptions", icon: "💎" },
     { label: "All Bookings", href: "/dashboard/all-bookings", icon: "📅" },
     { label: "All Payments", href: "/dashboard/all-payments", icon: "💳" },
   ];
@@ -77,13 +120,21 @@ export default function DashboardLayout({
   // Staff can only see bookings and customers
   const filteredNavItems = navItems.filter((item) => {
     if (user.role === "staff") {
-      return ["/dashboard", "/dashboard/bookings", "/dashboard/customers"].includes(
-        item.href
-      );
+      return [
+        "/dashboard",
+        "/dashboard/calendar",
+        "/dashboard/bookings",
+        "/dashboard/customers",
+        "/dashboard/sessions",
+      ].includes(item.href);
     }
-    // Manager can't see team or settings
+    // Manager can't see team, settings, or subscription
     if (user.role === "manager") {
-      return item.href !== "/dashboard/team" && item.href !== "/dashboard/settings";
+      return (
+        item.href !== "/dashboard/team" &&
+        item.href !== "/dashboard/settings" &&
+        item.href !== "/dashboard/subscription"
+      );
     }
     return true;
   });
@@ -153,6 +204,24 @@ export default function DashboardLayout({
           MAIN CONTENT
           ================================ */}
       <main className="flex-1 bg-gray-50">
+        {/* Subscription expired banner */}
+        {/* Shows at the top of every dashboard page when subscription is expired */}
+        {subscriptionExpired && (
+          <div className="bg-red-500 text-white px-8 py-3 flex items-center justify-between">
+            <div>
+              <span className="font-medium">⚠️ Your subscription has {subscriptionStatus === "canceled" ? "been canceled" : "expired"}.</span>
+              <span className="ml-2 text-red-100">
+                You cannot create new bookings until you renew.
+              </span>
+            </div>
+            <Link
+              href="/dashboard/subscription"
+              className="bg-white text-red-600 px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-red-50"
+            >
+              Renew Now
+            </Link>
+          </div>
+        )}
         <div className="p-8">{children}</div>
       </main>
     </div>

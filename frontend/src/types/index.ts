@@ -35,13 +35,60 @@ export interface Company {
   country: string;
   website: string;
   ownerId: string;
+  subscriptionId?: string; // Reference to the active Subscription document
   subscription: {
-    plan: "free" | "basic" | "premium";
-    status: "active" | "inactive" | "cancelled";
+    plan: "basic" | "pro" | "premium";
+    status: "active" | "expired" | "canceled" | "trial";
     startDate: string;
     endDate?: string;
   };
   isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ================================
+// SUBSCRIPTION
+// Tracks a company's monthly subscription
+// ================================
+export interface Subscription {
+  _id: string;
+  companyId: string | Company;
+  plan: "basic" | "pro" | "premium";
+  status: "active" | "expired" | "canceled" | "trial";
+  pricePerMonth: number; // In cents
+  startDate: string;
+  nextBillingDate: string;
+  canceledAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ================================
+// SUBSCRIPTION PLAN
+// The plan options shown to users
+// ================================
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  pricePerMonth: number; // In cents
+  maxRooms: number;
+  maxBookingsPerMonth: number;
+  features: string[];
+}
+
+// ================================
+// SUBSCRIPTION PAYMENT
+// Records actual payments made for subscriptions
+// ================================
+export interface SubscriptionPayment {
+  _id: string;
+  companyId: string | Company;
+  subscriptionId: string | Subscription;
+  amount: number; // In cents
+  plan: "basic" | "pro" | "premium";
+  type: "new" | "renewal";
+  status: "completed" | "failed" | "refunded";
   createdAt: string;
   updatedAt: string;
 }
@@ -85,6 +132,50 @@ export interface SurfPackage {
 }
 
 // ================================
+// ACTIVITY
+// A surf activity (e.g., Surf Lesson, Yoga, Airport Transfer)
+// ================================
+export interface Activity {
+  _id: string;
+  companyId: string;
+  name: string;
+  description: string;
+  price: number; // In cents
+  duration: number; // In minutes
+  capacity: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ================================
+// SESSION
+// A time slot for an activity with capacity tracking
+// ================================
+export interface Session {
+  _id: string;
+  activityId: string | Activity;
+  companyId: string;
+  date: string;
+  startTime: string; // HH:mm
+  endTime: string; // HH:mm
+  capacity: number;
+  bookedCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ================================
+// BOOKING ACTIVITY
+// An activity+session pair attached to a booking
+// ================================
+export interface BookingActivity {
+  activityId: string | Activity;
+  sessionId: string | Session;
+  price: number; // In cents at the time of booking
+}
+
+// ================================
 // BOOKING
 // A reservation made by a customer
 // ================================
@@ -94,12 +185,14 @@ export interface Booking {
   customerId: string | Customer;
   roomId: string | Room;
   packageId?: string | SurfPackage;
+  activities: BookingActivity[];
   checkIn: string;
   checkOut: string;
   numberOfGuests: number;
   numberOfNights: number;
   roomTotal: number;
   packageTotal: number;
+  activitiesTotal: number;
   totalPrice: number;
   status: "pending" | "confirmed" | "cancelled" | "completed";
   paymentStatus: "unpaid" | "partial" | "paid" | "refunded";
@@ -138,6 +231,8 @@ export interface Payment {
   amount: number;
   method: "credit_card" | "bank_transfer" | "cash" | "other";
   status: "pending" | "completed" | "failed" | "refunded";
+  type: "deposit" | "full" | "remaining" | "refund";
+  paidAt?: string;
   notes: string;
   createdAt: string;
   updatedAt: string;
@@ -172,4 +267,8 @@ export interface Analytics {
   totalBookings: number;
   totalCustomers: number;
   totalRevenue: number;
+  // Subscription analytics for super admin (from real payments)
+  activeSubscriptions: number;
+  totalSubscriptionRevenue: number;
+  monthlySubscriptionRevenue: number;
 }

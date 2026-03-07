@@ -25,6 +25,7 @@ export default function PaymentsPage() {
     bookingId: "",
     amount: 0,
     method: "credit_card" as Payment["method"],
+    type: "full" as Payment["type"],
     notes: "",
   });
 
@@ -53,6 +54,7 @@ export default function PaymentsPage() {
         bookingId: form.bookingId,
         amount: Math.round(form.amount * 100), // dollars to cents
         method: form.method,
+        type: form.type,
         notes: form.notes,
       });
       setShowForm(false);
@@ -155,6 +157,27 @@ export default function PaymentsPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Payment Type
+              </label>
+              <select
+                className="input"
+                value={form.type}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    type: e.target.value as Payment["type"],
+                  })
+                }
+              >
+                <option value="full">Full Payment</option>
+                <option value="deposit">Deposit</option>
+                <option value="remaining">Remaining Balance</option>
+                <option value="refund">Refund</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Notes
               </label>
               <input
@@ -197,6 +220,7 @@ export default function PaymentsPage() {
                 <th className="pb-3 font-medium">Customer</th>
                 <th className="pb-3 font-medium">Amount</th>
                 <th className="pb-3 font-medium">Method</th>
+                <th className="pb-3 font-medium">Type</th>
                 <th className="pb-3 font-medium">Status</th>
                 <th className="pb-3 font-medium">Date</th>
               </tr>
@@ -215,6 +239,19 @@ export default function PaymentsPage() {
                     </td>
                     <td className="py-3 capitalize">
                       {payment.method.replace("_", " ")}
+                    </td>
+                    <td className="py-3">
+                      <span className={`badge ${
+                        payment.type === "refund"
+                          ? "bg-red-100 text-red-700"
+                          : payment.type === "deposit"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : payment.type === "remaining"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
+                      }`}>
+                        {capitalize(payment.type || "full")}
+                      </span>
                     </td>
                     <td className="py-3">
                       <span

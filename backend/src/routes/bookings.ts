@@ -10,7 +10,11 @@ import Booking from "../models/Booking";
 import Room from "../models/Room";
 import Package from "../models/Package";
 import Customer from "../models/Customer";
+import Company from "../models/Company";
+import Activity from "../models/Activity";
+import Session from "../models/Session";
 import { verifyToken, requireRole, AuthRequest } from "../middleware/auth";
+import { requireActiveSubscription } from "../middleware/subscription";
 import { calculateNights, calculateBookingPrice } from "../utils/helpers";
 
 const router = express.Router();
@@ -25,6 +29,9 @@ const router = express.Router();
 // 2. Verify the room is still available
 // 3. Calculate the price
 // 4. Create the booking
+//
+// NOTE: We check if the company's subscription is active.
+// If expired, the booking is blocked and the customer sees an error.
 // ================================
 router.post("/", async (req: AuthRequest, res: Response) => {
   try {
@@ -41,7 +48,28 @@ router.post("/", async (req: AuthRequest, res: Response) => {
       email,
       phone,
       notes,
+      // Activities (optional array of { activityId, sessionId })
+      activities,
     } = req.body;
+
+    // ================================
+    // STEP 0: Check company subscription
+    // If the company's subscription is expired, block booking creation.
+    // This protects the platform — only paying companies can receive bookings.
+    // ================================
+    const company = await Company.findById(companyId);
+    if (!company || !company.isActive) {
+      res.status(404).json({ message: "Company not found or inactive." });
+      return;
+    }
+
+    const subStatus = company.subscription?.status;
+    if (subStatus === "expired" || subStatus === "canceled") {
+      res.status(403).json({
+        message: "This company's booking system is temporarily unavailable. Please contact them directly.",
+      });
+      return;
+    }
 
     // ================================
     // STEP 1: Validate dates
@@ -124,12 +152,64 @@ router.post("/", async (req: AuthRequest, res: Response) => {
     // ================================
     // STEP 5: Calculate total price
     // ================================
-    const { roomTotal, packageTotal, totalPrice } = calculateBookingPrice(
+    const { roomTotal, packageTotal, totalPrice: baseTotalPrice } = calculateBookingPrice(
       room.pricePerNight,
       numberOfNights,
       packagePricePerPerson,
       numberOfGuests
     );
+
+    // ================================
+    // STEP 5b: Validate & price activities
+    // If the customer selected activities+sessions, validate them
+    // and accumulate their prices.
+    // ================================
+    let activitiesTotal = 0;
+    const bookingActivities: { activityId: string; sessionId: string; price: number }[] = [];
+
+    if (activities && Array.isArray(activities) && activities.length > 0) {
+      for (const act of activities) {
+        const { activityId, sessionId } = act;
+
+        // Verify the activity belongs to this company
+        const activity = await Activity.findOne({
+          _id: activityId,
+          companyId,
+          isActive: true,
+        });
+        if (!activity) {
+          res.status(404).json({ message: `Activity ${activityId} not found.` });
+          return;
+        }
+
+        // Verify the session exists, belongs to the activity, and has capacity
+        const session = await Session.findOne({
+          _id: sessionId,
+          activityId,
+          companyId,
+        });
+        if (!session) {
+          res.status(404).json({ message: `Session ${sessionId} not found.` });
+          return;
+        }
+
+        if (session.bookedCount >= session.capacity) {
+          res.status(400).json({
+            message: `Session for "${activity.name}" on ${session.date.toISOString().split("T")[0]} at ${session.startTime} is fully booked.`,
+          });
+          return;
+        }
+
+        bookingActivities.push({
+          activityId,
+          sessionId,
+          price: activity.price,
+        });
+        activitiesTotal += activity.price;
+      }
+    }
+
+    const totalPrice = baseTotalPrice + activitiesTotal;
 
     // ================================
     // STEP 6: Create or find the customer
@@ -160,12 +240,14 @@ router.post("/", async (req: AuthRequest, res: Response) => {
       customerId: customer._id,
       roomId,
       packageId: packageId || null,
+      activities: bookingActivities,
       checkIn: checkInDate,
       checkOut: checkOutDate,
       numberOfGuests,
       numberOfNights,
       roomTotal,
       packageTotal,
+      activitiesTotal,
       totalPrice,
       status: "pending",
       paymentStatus: "unpaid",
@@ -174,12 +256,24 @@ router.post("/", async (req: AuthRequest, res: Response) => {
 
     await booking.save();
 
+    // ================================
+    // STEP 7b: Increment bookedCount on sessions
+    // Now that the booking is saved, mark those session seats as taken.
+    // ================================
+    for (const act of bookingActivities) {
+      await Session.updateOne(
+        { _id: act.sessionId },
+        { $inc: { bookedCount: 1 } }
+      );
+    }
+
     res.status(201).json({
       message: "Booking created successfully!",
       booking,
       priceBreakdown: {
         roomTotal,
         packageTotal,
+        activitiesTotal,
         totalPrice,
         numberOfNights,
       },

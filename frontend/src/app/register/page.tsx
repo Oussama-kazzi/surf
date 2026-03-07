@@ -40,8 +40,9 @@ export default function RegisterPage() {
     try {
       await register(formData);
 
-      // After registration, redirect to dashboard
-      router.push("/dashboard");
+      // After registration, redirect to subscription page
+      // so the new owner can see the plans and choose one
+      router.push("/dashboard/subscription");
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {

@@ -13,6 +13,8 @@ export interface IPayment extends Document {
   amount: number; // Amount in cents
   method: "credit_card" | "bank_transfer" | "cash" | "other";
   status: "pending" | "completed" | "failed" | "refunded";
+  type: "deposit" | "full" | "remaining" | "refund";
+  paidAt?: Date;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -50,6 +52,17 @@ const paymentSchema = new Schema<IPayment>(
       type: String,
       enum: ["pending", "completed", "failed", "refunded"],
       default: "pending",
+    },
+    // Payment type: deposit, full, remaining, or refund
+    type: {
+      type: String,
+      enum: ["deposit", "full", "remaining", "refund"],
+      default: "full",
+    },
+    // When the payment was actually made
+    paidAt: {
+      type: Date,
+      default: null,
     },
     notes: {
       type: String,

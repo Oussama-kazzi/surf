@@ -44,7 +44,7 @@ router.post(
   requireRole("admin", "manager"),
   async (req: AuthRequest, res: Response) => {
     try {
-      const { bookingId, amount, method, notes } = req.body;
+      const { bookingId, amount, method, type, notes } = req.body;
 
       // Find the booking
       const booking = await Booking.findOne({
@@ -64,6 +64,8 @@ router.post(
         customerId: booking.customerId,
         amount,
         method,
+        type: type || "full",
+        paidAt: new Date(),
         status: "completed",
         notes,
       });

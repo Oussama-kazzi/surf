@@ -16,6 +16,8 @@ export default function TeamPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
+  const [formError, setFormError] = useState("");
+
   // New member form
   const [form, setForm] = useState({
     firstName: "",
@@ -40,7 +42,20 @@ export default function TeamPage() {
     }
   }
 
-  async function handleAddMember() {
+  async function handleAddMember(e: React.FormEvent) {
+    e.preventDefault();
+    setFormError("");
+
+    // Client-side validation
+    if (!form.firstName || !form.lastName || !form.email || !form.password) {
+      setFormError("All fields are required.");
+      return;
+    }
+    if (form.password.length < 6) {
+      setFormError("Password must be at least 6 characters.");
+      return;
+    }
+
     try {
       await teamApi.add(form);
       setShowForm(false);
@@ -86,8 +101,14 @@ export default function TeamPage() {
 
       {/* Add Member Form */}
       {showForm && (
-        <div className="card mb-6">
+        <form onSubmit={handleAddMember} className="card mb-6">
           <h2 className="text-lg font-semibold mb-4">Add Team Member</h2>
+
+          {formError && (
+            <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
+              {formError}
+            </div>
+          )}
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
@@ -101,6 +122,7 @@ export default function TeamPage() {
                 onChange={(e) =>
                   setForm({ ...form, firstName: e.target.value })
                 }
+                required
               />
             </div>
             <div>
@@ -114,6 +136,7 @@ export default function TeamPage() {
                 onChange={(e) =>
                   setForm({ ...form, lastName: e.target.value })
                 }
+                required
               />
             </div>
             <div>
@@ -125,6 +148,7 @@ export default function TeamPage() {
                 className="input"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
               />
             </div>
             <div>
@@ -139,6 +163,7 @@ export default function TeamPage() {
                   setForm({ ...form, password: e.target.value })
                 }
                 minLength={6}
+                required
               />
             </div>
             <div>
@@ -162,17 +187,18 @@ export default function TeamPage() {
           </div>
 
           <div className="flex gap-3 mt-4">
-            <button onClick={handleAddMember} className="btn-primary">
+            <button type="submit" className="btn-primary">
               Add Member
             </button>
             <button
-              onClick={() => setShowForm(false)}
+              type="button"
+              onClick={() => { setShowForm(false); setFormError(""); }}
               className="btn-secondary"
             >
               Cancel
             </button>
           </div>
-        </div>
+        </form>
       )}
 
       {/* Team List */}

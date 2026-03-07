@@ -10,6 +10,7 @@ import express, { Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
 import Company from "../models/Company";
+import Subscription, { SUBSCRIPTION_PLANS } from "../models/Subscription";
 import { verifyToken, AuthRequest } from "../middleware/auth";
 import { generateSlug } from "../utils/helpers";
 
@@ -56,6 +57,34 @@ router.post("/register", async (req: AuthRequest, res: Response) => {
       // Link the user to the company
       user.companyId = company._id as any;
       await user.save();
+
+      // ================================
+      // CREATE A 15-DAY FREE TRIAL
+      // Every new company gets a trial subscription.
+      // They start on the "basic" plan and can upgrade later.
+      // ================================
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 15); // 15 days from now
+
+      const subscription = new Subscription({
+        companyId: company._id,
+        plan: "basic",
+        status: "trial",
+        pricePerMonth: SUBSCRIPTION_PLANS.basic.pricePerMonth,
+        startDate: new Date(),
+        nextBillingDate: trialEnd,
+      });
+      await subscription.save();
+
+      // Update company with subscription info
+      company.subscriptionId = subscription._id as any;
+      company.subscription = {
+        plan: "basic",
+        status: "trial",
+        startDate: new Date(),
+        endDate: trialEnd,
+      };
+      await company.save();
     }
 
     // Create a JWT token for the new user

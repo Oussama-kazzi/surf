@@ -211,6 +211,53 @@ export const paymentApi = {
 };
 
 // ================================
+// ACTIVITY API
+// ================================
+export const activityApi = {
+  // Get activities for a company (public)
+  getForCompany: (companyId: string) =>
+    apiRequest(`/activities/company/${companyId}`),
+
+  // Get all activities for my company (dashboard)
+  getAll: () => apiRequest("/activities"),
+
+  // Create activity
+  create: (data: any) =>
+    apiRequest("/activities", { method: "POST", body: JSON.stringify(data) }),
+
+  // Update activity
+  update: (id: string, data: any) =>
+    apiRequest(`/activities/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+
+  // Delete (soft-delete) activity
+  delete: (id: string) => apiRequest(`/activities/${id}`, { method: "DELETE" }),
+};
+
+// ================================
+// SESSION API
+// ================================
+export const sessionApi = {
+  // Get sessions (public, filter by activityId / date / companyId)
+  get: (params?: string) =>
+    apiRequest(`/sessions${params ? `?${params}` : ""}`),
+
+  // Get sessions for my company (dashboard)
+  getMine: (params?: string) =>
+    apiRequest(`/sessions/mine${params ? `?${params}` : ""}`),
+
+  // Create session
+  create: (data: any) =>
+    apiRequest("/sessions", { method: "POST", body: JSON.stringify(data) }),
+
+  // Update session
+  update: (id: string, data: any) =>
+    apiRequest(`/sessions/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+
+  // Delete session
+  delete: (id: string) => apiRequest(`/sessions/${id}`, { method: "DELETE" }),
+};
+
+// ================================
 // ADMIN API (Super Admin)
 // ================================
 export const adminApi = {
@@ -240,4 +287,44 @@ export const adminApi = {
 
   // Get all payments
   getPayments: () => apiRequest("/admin/payments"),
+
+  // Get all subscriptions
+  getSubscriptions: () => apiRequest("/admin/subscriptions"),
+
+  // Get all subscription payments (real revenue records)
+  getSubscriptionPayments: () => apiRequest("/admin/subscription-payments"),
+
+  // Update a company's subscription (plan, status, add days)
+  updateSubscription: (companyId: string, data: any) =>
+    apiRequest(`/admin/companies/${companyId}/subscription`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+};
+
+// ================================
+// SUBSCRIPTION API
+// For company owners to manage their subscription.
+// ================================
+export const subscriptionApi = {
+  // Get available plans
+  getPlans: () => apiRequest("/subscriptions/plans"),
+
+  // Get my company's current subscription
+  getMine: () => apiRequest("/subscriptions/mine"),
+
+  // Subscribe to a plan (simulated payment)
+  subscribe: (plan: string) =>
+    apiRequest("/subscriptions/subscribe", {
+      method: "POST",
+      body: JSON.stringify({ plan }),
+    }),
+
+  // Renew an expired subscription
+  renew: () =>
+    apiRequest("/subscriptions/renew", { method: "POST" }),
+
+  // Cancel subscription
+  cancel: () =>
+    apiRequest("/subscriptions/cancel", { method: "POST" }),
 };

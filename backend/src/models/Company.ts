@@ -19,9 +19,10 @@ export interface ICompany extends Document {
   country: string;
   website?: string;
   ownerId: mongoose.Types.ObjectId; // The admin user who owns this company
+  subscriptionId?: mongoose.Types.ObjectId; // Reference to the active Subscription document
   subscription: {
-    plan: "free" | "basic" | "premium";
-    status: "active" | "inactive" | "cancelled";
+    plan: "basic" | "pro" | "premium";
+    status: "active" | "expired" | "canceled" | "trial";
     startDate: Date;
     endDate?: Date;
   };
@@ -89,17 +90,25 @@ const companySchema = new Schema<ICompany>(
       ref: "User",
       required: true,
     },
+    // Reference to the active Subscription document
+    // This links the company to their subscription in the Subscription collection
+    subscriptionId: {
+      type: Schema.Types.ObjectId,
+      ref: "Subscription",
+      default: null,
+    },
     // Subscription info for the SaaS billing
+    // We keep a copy here for quick access (denormalized)
     subscription: {
       plan: {
         type: String,
-        enum: ["free", "basic", "premium"],
-        default: "free",
+        enum: ["basic", "pro", "premium"],
+        default: "basic",
       },
       status: {
         type: String,
-        enum: ["active", "inactive", "cancelled"],
-        default: "active",
+        enum: ["active", "expired", "canceled", "trial"],
+        default: "trial",
       },
       startDate: {
         type: Date,

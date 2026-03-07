@@ -1,59 +1,70 @@
 // ================================
-// PUBLIC BOOKING PAGE
-// This is the page customers see when they click "Book Now"
-// on a surf company's landing page.
+// PUBLIC BOOKING PAGE — 7-STEP WIZARD
+// URL: /book/[slug]
 //
-// URL: /book/[slug] (e.g., /book/bali-surf-camp)
-//
-// FLOW:
-// 1. Customer selects check-in and check-out dates
-// 2. System shows available rooms for those dates
-// 3. Customer picks a room
-// 4. Customer optionally picks a surf package
-// 5. Customer fills in their details
-// 6. Customer submits the booking
+// STEPS:
+// 1. Select Dates (check-in, check-out, guests)
+// 2. Select Room
+// 3. Select Package (optional)
+// 4. Select Activities (optional, multi-select)
+// 5. Select Sessions for chosen activities
+// 6. Customer Information
+// 7. Review & Confirm
 // ================================
 
 "use client";
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { companyApi, roomApi, packageApi, bookingApi } from "@/lib/api";
-import { formatPrice, calculateNights } from "@/lib/helpers";
-import { Company, Room, SurfPackage } from "@/types";
+import {
+  companyApi,
+  roomApi,
+  packageApi,
+  bookingApi,
+  activityApi,
+  sessionApi,
+} from "@/lib/api";
+import { formatPrice, calculateNights, formatDate } from "@/lib/helpers";
+import { Company, Room, SurfPackage, Activity, Session } from "@/types";
+
+// Represents an activity the user has selected + the session they picked
+interface SelectedActivity {
+  activity: Activity;
+  session: Session | null; // null until they pick a session in step 5
+}
 
 export default function BookingPage() {
-  // Get the company slug from the URL
   const params = useParams();
   const slug = params.slug as string;
 
   // ================================
   // STATE
-  // We track where the customer is in the booking process
-  // using a "step" variable (1, 2, 3, or 4).
   // ================================
-  const [step, setStep] = useState(1); // Current step (1-4)
+  const [step, setStep] = useState(1);
   const [company, setCompany] = useState<Company | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [packages, setPackages] = useState<SurfPackage[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  // Date selection (Step 1)
+  // Step 1: Dates
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(1);
 
-  // Room selection (Step 2)
+  // Step 2: Room
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
-  // Package selection (Step 3)
-  const [selectedPackage, setSelectedPackage] = useState<SurfPackage | null>(
-    null
-  );
+  // Step 3: Package
+  const [selectedPackage, setSelectedPackage] = useState<SurfPackage | null>(null);
 
-  // Customer info (Step 4)
+  // Step 4 + 5: Activities & Sessions
+  const [selectedActivities, setSelectedActivities] = useState<SelectedActivity[]>([]);
+  const [activitySessions, setActivitySessions] = useState<Record<string, Session[]>>({});
+
+  // Step 6: Customer Info
   const [customerInfo, setCustomerInfo] = useState({
     firstName: "",
     lastName: "",
@@ -64,7 +75,6 @@ export default function BookingPage() {
 
   // ================================
   // LOAD COMPANY DATA
-  // When the page loads, fetch the company info.
   // ================================
   useEffect(() => {
     async function loadCompany() {
@@ -72,29 +82,29 @@ export default function BookingPage() {
         const data = await companyApi.getBySlug(slug);
         setCompany(data.company);
 
-        // Also load packages for this company
-        const pkgData = await packageApi.getForCompany(data.company._id);
+        const [pkgData, actData] = await Promise.all([
+          packageApi.getForCompany(data.company._id),
+          activityApi.getForCompany(data.company._id),
+        ]);
         setPackages(pkgData.packages);
+        setActivities(actData.activities);
       } catch (err: any) {
         setError("Company not found.");
       } finally {
         setLoading(false);
       }
     }
-
     loadCompany();
   }, [slug]);
 
   // ================================
-  // STEP 1: SEARCH AVAILABLE ROOMS
-  // When customer picks dates, we fetch available rooms.
+  // STEP 1: SEARCH ROOMS
   // ================================
   async function searchRooms() {
     if (!checkIn || !checkOut) {
       setError("Please select both check-in and check-out dates.");
       return;
     }
-
     if (new Date(checkIn) >= new Date(checkOut)) {
       setError("Check-out must be after check-in.");
       return;
@@ -105,15 +115,10 @@ export default function BookingPage() {
 
     try {
       const data = await roomApi.getAvailable(company!._id, checkIn, checkOut);
-      setRooms(data.rooms);
-
-      // Filter rooms by guest capacity
       const suitableRooms = data.rooms.filter(
         (room: Room) => room.capacity >= guests
       );
       setRooms(suitableRooms);
-
-      // Move to step 2
       setStep(2);
     } catch (err: any) {
       setError(err.message || "Failed to search rooms.");
@@ -123,11 +128,93 @@ export default function BookingPage() {
   }
 
   // ================================
-  // STEP 4: SUBMIT BOOKING
-  // Send all the booking data to the API.
+  // STEP 4: TOGGLE ACTIVITY SELECTION
+  // ================================
+  function toggleActivity(activity: Activity) {
+    setSelectedActivities((prev) => {
+      const exists = prev.find((sa) => sa.activity._id === activity._id);
+      if (exists) {
+        return prev.filter((sa) => sa.activity._id !== activity._id);
+      }
+      return [...prev, { activity, session: null }];
+    });
+  }
+
+  // ================================
+  // STEP 5: LOAD SESSIONS FOR ACTIVITIES
+  // ================================
+  async function loadSessionsForActivities() {
+    if (selectedActivities.length === 0) return;
+
+    setLoading(true);
+    try {
+      const sessionsMap: Record<string, Session[]> = {};
+
+      await Promise.all(
+        selectedActivities.map(async (sa) => {
+          const qp = new URLSearchParams({
+            activityId: sa.activity._id,
+            companyId: company!._id,
+          });
+          const data = await sessionApi.get(qp.toString());
+          // Filter to sessions within the booking date range
+          const filtered = data.sessions.filter((s: Session) => {
+            const sDate = new Date(s.date);
+            return sDate >= new Date(checkIn) && sDate < new Date(checkOut);
+          });
+          sessionsMap[sa.activity._id] = filtered;
+        })
+      );
+
+      setActivitySessions(sessionsMap);
+    } catch (err) {
+      console.error("Error loading sessions:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ================================
+  // STEP 5: SELECT SESSION FOR AN ACTIVITY
+  // ================================
+  function selectSession(activityId: string, session: Session) {
+    setSelectedActivities((prev) =>
+      prev.map((sa) =>
+        sa.activity._id === activityId ? { ...sa, session } : sa
+      )
+    );
+  }
+
+  // ================================
+  // PRICE CALCULATION
+  // ================================
+  function getRoomTotal(): number {
+    if (!selectedRoom || !checkIn || !checkOut) return 0;
+    return selectedRoom.pricePerNight * calculateNights(checkIn, checkOut);
+  }
+
+  function getPackageTotal(): number {
+    if (!selectedPackage) return 0;
+    return selectedPackage.pricePerPerson * guests;
+  }
+
+  function getActivitiesTotal(): number {
+    return selectedActivities.reduce((sum, sa) => sum + sa.activity.price, 0);
+  }
+
+  function getTotalPrice(): number {
+    return getRoomTotal() + getPackageTotal() + getActivitiesTotal();
+  }
+
+  // ================================
+  // STEP 7: SUBMIT BOOKING
   // ================================
   async function submitBooking() {
-    if (!customerInfo.firstName || !customerInfo.lastName || !customerInfo.email) {
+    if (
+      !customerInfo.firstName ||
+      !customerInfo.lastName ||
+      !customerInfo.email
+    ) {
       setError("Please fill in all required fields.");
       return;
     }
@@ -136,10 +223,18 @@ export default function BookingPage() {
     setLoading(true);
 
     try {
+      const activitiesPayload = selectedActivities
+        .filter((sa) => sa.session)
+        .map((sa) => ({
+          activityId: sa.activity._id,
+          sessionId: sa.session!._id,
+        }));
+
       await bookingApi.create({
         companyId: company!._id,
         roomId: selectedRoom!._id,
         packageId: selectedPackage?._id || null,
+        activities: activitiesPayload.length > 0 ? activitiesPayload : undefined,
         checkIn,
         checkOut,
         numberOfGuests: guests,
@@ -159,23 +254,45 @@ export default function BookingPage() {
   }
 
   // ================================
-  // PRICE CALCULATION
-  // Calculate and display the total price.
+  // STEP NAVIGATION
   // ================================
-  function getTotalPrice(): number {
-    if (!selectedRoom || !checkIn || !checkOut) return 0;
+  const stepLabels = [
+    "Dates",
+    "Room",
+    "Package",
+    "Activities",
+    "Sessions",
+    "Details",
+    "Review",
+  ];
 
-    const nights = calculateNights(checkIn, checkOut);
-    const roomTotal = selectedRoom.pricePerNight * nights;
-    const packageTotal = selectedPackage
-      ? selectedPackage.pricePerPerson * guests
-      : 0;
+  function goToStep(target: number) {
+    setError("");
+    if (target === 5 && selectedActivities.length > 0) {
+      loadSessionsForActivities();
+    }
+    setStep(target);
+  }
 
-    return roomTotal + packageTotal;
+  function handleNextFromActivities() {
+    if (selectedActivities.length > 0) {
+      goToStep(5);
+    } else {
+      goToStep(6);
+    }
+  }
+
+  function handleNextFromSessions() {
+    const allHaveSessions = selectedActivities.every((sa) => sa.session);
+    if (!allHaveSessions) {
+      setError("Please select a session for each activity, or go back and remove it.");
+      return;
+    }
+    goToStep(6);
   }
 
   // ================================
-  // LOADING STATE
+  // LOADING
   // ================================
   if (loading && !company) {
     return (
@@ -188,9 +305,6 @@ export default function BookingPage() {
     );
   }
 
-  // ================================
-  // COMPANY NOT FOUND
-  // ================================
   if (!company) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -206,7 +320,7 @@ export default function BookingPage() {
   }
 
   // ================================
-  // SUCCESS STATE
+  // SUCCESS
   // ================================
   if (success) {
     return (
@@ -244,6 +358,23 @@ export default function BookingPage() {
                 <strong>{selectedPackage.name}</strong>
               </p>
             )}
+            {selectedActivities.length > 0 && (
+              <div>
+                <span className="text-gray-500">Activities:</span>
+                <ul className="ml-4 list-disc">
+                  {selectedActivities.map((sa) => (
+                    <li key={sa.activity._id}>
+                      <strong>{sa.activity.name}</strong>
+                      {sa.session && (
+                        <span className="text-gray-500 text-sm">
+                          {" "}— {formatDate(sa.session.date)} {sa.session.startTime}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <p>
               <span className="text-gray-500">Total:</span>{" "}
               <strong className="text-ocean-600">
@@ -274,46 +405,51 @@ export default function BookingPage() {
 
       {/* Step Indicator */}
       <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="flex items-center gap-2 mb-8">
-          {["Dates", "Room", "Package", "Details"].map((label, index) => (
-            <div key={label} className="flex items-center gap-2">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step > index + 1
-                    ? "bg-green-500 text-white"
-                    : step === index + 1
-                    ? "bg-ocean-600 text-white"
-                    : "bg-gray-200 text-gray-500"
-                }`}
-              >
-                {step > index + 1 ? "✓" : index + 1}
+        <div className="flex items-center gap-1 mb-8 overflow-x-auto">
+          {stepLabels.map((label, index) => {
+            const stepNum = index + 1;
+            const isSkipped =
+              stepNum === 5 && selectedActivities.length === 0 && step !== 5;
+            if (isSkipped) return null;
+
+            return (
+              <div key={label} className="flex items-center gap-1">
+                <div
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${
+                    step > stepNum
+                      ? "bg-green-500 text-white"
+                      : step === stepNum
+                      ? "bg-ocean-600 text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  {step > stepNum ? "✓" : stepNum}
+                </div>
+                <span
+                  className={`text-xs whitespace-nowrap ${
+                    step === stepNum
+                      ? "font-medium text-gray-900"
+                      : "text-gray-500"
+                  }`}
+                >
+                  {label}
+                </span>
+                {index < stepLabels.length - 1 && (
+                  <div className="w-6 h-px bg-gray-300 mx-0.5"></div>
+                )}
               </div>
-              <span
-                className={`text-sm ${
-                  step === index + 1
-                    ? "font-medium text-gray-900"
-                    : "text-gray-500"
-                }`}
-              >
-                {label}
-              </span>
-              {index < 3 && (
-                <div className="w-12 h-px bg-gray-300 mx-1"></div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Error message */}
+        {/* Error */}
         {error && (
           <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-4 text-sm">
             {error}
           </div>
         )}
 
-        {/* ================================
-            STEP 1: SELECT DATES
-            ================================ */}
+        {/* STEP 1: SELECT DATES */}
         {step === 1 && (
           <div className="card">
             <h2 className="text-xl font-semibold mb-4">
@@ -362,7 +498,6 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* Show nights count */}
             {checkIn && checkOut && new Date(checkIn) < new Date(checkOut) && (
               <p className="text-ocean-600 mt-4 font-medium">
                 📅 {calculateNights(checkIn, checkOut)} night(s)
@@ -379,15 +514,13 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* ================================
-            STEP 2: SELECT ROOM
-            ================================ */}
+        {/* STEP 2: SELECT ROOM */}
         {step === 2 && (
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">Choose a Room</h2>
               <button
-                onClick={() => setStep(1)}
+                onClick={() => goToStep(1)}
                 className="text-ocean-600 hover:underline text-sm"
               >
                 ← Change dates
@@ -400,10 +533,7 @@ export default function BookingPage() {
                 <p className="text-gray-600">
                   No rooms available for your selected dates.
                 </p>
-                <button
-                  onClick={() => setStep(1)}
-                  className="btn-primary mt-4"
-                >
+                <button onClick={() => goToStep(1)} className="btn-primary mt-4">
                   Try different dates
                 </button>
               </div>
@@ -436,7 +566,6 @@ export default function BookingPage() {
                     <p className="text-gray-600 text-sm mt-2">
                       {room.description}
                     </p>
-                    {/* Amenities */}
                     {room.amenities.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-3">
                         {room.amenities.map((amenity) => (
@@ -467,7 +596,7 @@ export default function BookingPage() {
                   </strong>{" "}
                   for {calculateNights(checkIn, checkOut)} night(s)
                 </p>
-                <button onClick={() => setStep(3)} className="btn-primary px-8">
+                <button onClick={() => goToStep(3)} className="btn-primary px-8">
                   Continue
                 </button>
               </div>
@@ -475,20 +604,16 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* ================================
-            STEP 3: SELECT PACKAGE (OPTIONAL)
-            ================================ */}
+        {/* STEP 3: SELECT PACKAGE (OPTIONAL) */}
         {step === 3 && (
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">
                 Add a Surf Package{" "}
-                <span className="text-gray-400 text-sm font-normal">
-                  (optional)
-                </span>
+                <span className="text-gray-400 text-sm font-normal">(optional)</span>
               </h2>
               <button
-                onClick={() => setStep(2)}
+                onClick={() => goToStep(2)}
                 className="text-ocean-600 hover:underline text-sm"
               >
                 ← Change room
@@ -525,10 +650,7 @@ export default function BookingPage() {
                       <p className="text-gray-400 text-xs">per person</p>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm mt-2">
-                    {pkg.description}
-                  </p>
-                  {/* What's included */}
+                  <p className="text-gray-600 text-sm mt-2">{pkg.description}</p>
                   {pkg.includes.length > 0 && (
                     <ul className="mt-3 space-y-1">
                       {pkg.includes.map((item) => (
@@ -547,26 +669,223 @@ export default function BookingPage() {
 
             <div className="mt-6 flex justify-between items-center">
               <p className="text-gray-600">
-                Total:{" "}
+                Running total:{" "}
                 <strong className="text-ocean-600">
-                  {formatPrice(getTotalPrice())}
+                  {formatPrice(getRoomTotal() + getPackageTotal())}
                 </strong>
               </p>
-              <button onClick={() => setStep(4)} className="btn-primary px-8">
-                {selectedPackage ? "Continue" : "Skip — Just the Room"}
+              <button onClick={() => goToStep(4)} className="btn-primary px-8">
+                {selectedPackage ? "Continue" : "Skip — No Package"}
               </button>
             </div>
           </div>
         )}
 
-        {/* ================================
-            STEP 4: CUSTOMER DETAILS
-            ================================ */}
+        {/* STEP 4: SELECT ACTIVITIES (OPTIONAL, MULTI-SELECT) */}
         {step === 4 && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">
+                Add Activities{" "}
+                <span className="text-gray-400 text-sm font-normal">(optional)</span>
+              </h2>
+              <button
+                onClick={() => goToStep(3)}
+                className="text-ocean-600 hover:underline text-sm"
+              >
+                ← Back to packages
+              </button>
+            </div>
+
+            {activities.length === 0 ? (
+              <div className="card text-center py-8">
+                <p className="text-gray-500">No activities available at the moment.</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-4">
+                {activities.map((activity) => {
+                  const isSelected = selectedActivities.some(
+                    (sa) => sa.activity._id === activity._id
+                  );
+                  return (
+                    <div
+                      key={activity._id}
+                      className={`card cursor-pointer transition-all hover:shadow-md ${
+                        isSelected ? "ring-2 ring-ocean-500" : ""
+                      }`}
+                      onClick={() => toggleActivity(activity)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`w-5 h-5 rounded border-2 mt-1 flex items-center justify-center ${
+                              isSelected
+                                ? "bg-ocean-600 border-ocean-600 text-white"
+                                : "border-gray-300"
+                            }`}
+                          >
+                            {isSelected && <span className="text-xs">✓</span>}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg">{activity.name}</h3>
+                            <p className="text-gray-500 text-sm">
+                              ⏱ {activity.duration} min · 👥 Max {activity.capacity}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-xl font-bold text-ocean-600">
+                          {formatPrice(activity.price)}
+                        </p>
+                      </div>
+                      {activity.description && (
+                        <p className="text-gray-600 text-sm mt-2 ml-8">
+                          {activity.description}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-between items-center">
+              <p className="text-gray-600">
+                {selectedActivities.length > 0 ? (
+                  <>
+                    {selectedActivities.length} activit
+                    {selectedActivities.length === 1 ? "y" : "ies"} selected
+                    {" — "}
+                    <strong className="text-ocean-600">
+                      +{formatPrice(getActivitiesTotal())}
+                    </strong>
+                  </>
+                ) : (
+                  "No activities selected"
+                )}
+              </p>
+              <button onClick={handleNextFromActivities} className="btn-primary px-8">
+                {selectedActivities.length > 0
+                  ? "Choose Time Slots"
+                  : "Skip — No Activities"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 5: SELECT SESSIONS FOR EACH ACTIVITY */}
+        {step === 5 && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Choose Time Slots</h2>
+              <button
+                onClick={() => goToStep(4)}
+                className="text-ocean-600 hover:underline text-sm"
+              >
+                ← Back to activities
+              </button>
+            </div>
+
+            {loading ? (
+              <p className="text-gray-500">Loading available sessions...</p>
+            ) : (
+              <div className="space-y-6">
+                {selectedActivities.map((sa) => {
+                  const sessions = activitySessions[sa.activity._id] || [];
+                  return (
+                    <div key={sa.activity._id} className="card">
+                      <h3 className="font-semibold text-lg mb-1">
+                        {sa.activity.name}
+                      </h3>
+                      <p className="text-gray-500 text-sm mb-3">
+                        Select a time slot below
+                      </p>
+
+                      {sessions.length === 0 ? (
+                        <p className="text-yellow-600 text-sm">
+                          No sessions available during your stay dates. You can go
+                          back and remove this activity.
+                        </p>
+                      ) : (
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+                          {sessions.map((session) => {
+                            const spotsLeft = session.capacity - session.bookedCount;
+                            const isFull = spotsLeft <= 0;
+                            const isSelected = sa.session?._id === session._id;
+
+                            return (
+                              <button
+                                key={session._id}
+                                disabled={isFull}
+                                onClick={() =>
+                                  selectSession(sa.activity._id, session)
+                                }
+                                className={`p-3 rounded-lg border text-left transition-all ${
+                                  isSelected
+                                    ? "border-ocean-500 bg-ocean-50 ring-2 ring-ocean-500"
+                                    : isFull
+                                    ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed"
+                                    : "border-gray-200 hover:border-ocean-300 cursor-pointer"
+                                }`}
+                              >
+                                <p className="font-medium text-sm">
+                                  {formatDate(session.date)}
+                                </p>
+                                <p className="text-ocean-600 font-semibold">
+                                  {session.startTime} – {session.endTime}
+                                </p>
+                                <p
+                                  className={`text-xs mt-1 ${
+                                    isFull
+                                      ? "text-red-500"
+                                      : spotsLeft <= 2
+                                      ? "text-yellow-600"
+                                      : "text-green-600"
+                                  }`}
+                                >
+                                  {isFull
+                                    ? "Full"
+                                    : `${spotsLeft} spot${spotsLeft !== 1 ? "s" : ""} left`}
+                                </p>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-between items-center">
+              <p className="text-gray-600">
+                Running total:{" "}
+                <strong className="text-ocean-600">
+                  {formatPrice(getTotalPrice())}
+                </strong>
+              </p>
+              <button onClick={handleNextFromSessions} className="btn-primary px-8">
+                Continue
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 6: CUSTOMER DETAILS */}
+        {step === 6 && (
           <div className="grid md:grid-cols-3 gap-6">
-            {/* Customer form */}
             <div className="md:col-span-2 card">
-              <h2 className="text-xl font-semibold mb-4">Your Details</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Your Details</h2>
+                <button
+                  onClick={() =>
+                    goToStep(selectedActivities.length > 0 ? 5 : 4)
+                  }
+                  className="text-ocean-600 hover:underline text-sm"
+                >
+                  ← Back
+                </button>
+              </div>
 
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -660,11 +979,165 @@ export default function BookingPage() {
                 </div>
               </div>
 
-              <div className="flex gap-4 mt-6">
+              <button
+                onClick={() => goToStep(7)}
+                className="btn-primary mt-6 px-8"
+              >
+                Review Booking
+              </button>
+            </div>
+
+            {/* Mini Summary Sidebar */}
+            <div className="card h-fit">
+              <h3 className="font-semibold mb-4">Summary</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Room</span>
+                  <span>{selectedRoom?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Nights</span>
+                  <span>{calculateNights(checkIn, checkOut)}</span>
+                </div>
+                {selectedPackage && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Package</span>
+                    <span>{selectedPackage.name}</span>
+                  </div>
+                )}
+                {selectedActivities.length > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Activities</span>
+                    <span>{selectedActivities.length}</span>
+                  </div>
+                )}
+                <hr />
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total</span>
+                  <span className="text-ocean-600">
+                    {formatPrice(getTotalPrice())}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 7: REVIEW & CONFIRM */}
+        {step === 7 && (
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 card">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Review Your Booking</h2>
                 <button
-                  onClick={() => setStep(3)}
-                  className="btn-secondary"
+                  onClick={() => goToStep(6)}
+                  className="text-ocean-600 hover:underline text-sm"
                 >
+                  ← Edit details
+                </button>
+              </div>
+
+              {/* Guest Info */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  Guest Information
+                </h3>
+                <p className="font-medium">
+                  {customerInfo.firstName} {customerInfo.lastName}
+                </p>
+                <p className="text-gray-600 text-sm">{customerInfo.email}</p>
+                {customerInfo.phone && (
+                  <p className="text-gray-600 text-sm">{customerInfo.phone}</p>
+                )}
+                {customerInfo.notes && (
+                  <p className="text-gray-500 text-sm mt-1 italic">
+                    &ldquo;{customerInfo.notes}&rdquo;
+                  </p>
+                )}
+              </div>
+
+              {/* Stay Details */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  Stay Details
+                </h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-gray-500">Check-in:</span>{" "}
+                    <strong>{checkIn}</strong>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Check-out:</span>{" "}
+                    <strong>{checkOut}</strong>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Nights:</span>{" "}
+                    <strong>{calculateNights(checkIn, checkOut)}</strong>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Guests:</span>{" "}
+                    <strong>{guests}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Room */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  Room
+                </h3>
+                <p className="font-medium">{selectedRoom?.name}</p>
+                <p className="text-gray-500 text-sm capitalize">
+                  {selectedRoom?.type}
+                </p>
+              </div>
+
+              {/* Package */}
+              {selectedPackage && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Package
+                  </h3>
+                  <p className="font-medium">{selectedPackage.name}</p>
+                  <p className="text-gray-500 text-sm">
+                    {selectedPackage.durationDays} days ·{" "}
+                    {formatPrice(selectedPackage.pricePerPerson)}/person
+                  </p>
+                </div>
+              )}
+
+              {/* Activities */}
+              {selectedActivities.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Activities
+                  </h3>
+                  <div className="space-y-2">
+                    {selectedActivities.map((sa) => (
+                      <div
+                        key={sa.activity._id}
+                        className="flex justify-between items-center text-sm"
+                      >
+                        <div>
+                          <p className="font-medium">{sa.activity.name}</p>
+                          {sa.session && (
+                            <p className="text-gray-500">
+                              {formatDate(sa.session.date)}{" "}
+                              {sa.session.startTime} – {sa.session.endTime}
+                            </p>
+                          )}
+                        </div>
+                        <span className="font-medium text-ocean-600">
+                          {formatPrice(sa.activity.price)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-4 mt-6">
+                <button onClick={() => goToStep(6)} className="btn-secondary">
                   ← Back
                 </button>
                 <button
@@ -677,54 +1150,35 @@ export default function BookingPage() {
               </div>
             </div>
 
-            {/* Order Summary */}
+            {/* Price Breakdown Sidebar */}
             <div className="card h-fit">
-              <h3 className="font-semibold mb-4">Booking Summary</h3>
+              <h3 className="font-semibold mb-4">Price Breakdown</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Room</span>
-                  <span className="font-medium">{selectedRoom?.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Check-in</span>
-                  <span>{checkIn}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Check-out</span>
-                  <span>{checkOut}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Nights</span>
-                  <span>{calculateNights(checkIn, checkOut)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Guests</span>
-                  <span>{guests}</span>
-                </div>
-                {selectedPackage && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Package</span>
-                    <span>{selectedPackage.name}</span>
-                  </div>
-                )}
-                <hr />
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Room cost</span>
-                  <span>
-                    {formatPrice(
-                      (selectedRoom?.pricePerNight || 0) *
-                        calculateNights(checkIn, checkOut)
-                    )}
+                  <span className="text-gray-500">
+                    Room ({calculateNights(checkIn, checkOut)} nights)
                   </span>
+                  <span>{formatPrice(getRoomTotal())}</span>
                 </div>
+
                 {selectedPackage && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Package</span>
-                    <span>
-                      {formatPrice(selectedPackage.pricePerPerson * guests)}
+                    <span className="text-gray-500">
+                      Package ({guests} guest{guests !== 1 ? "s" : ""})
                     </span>
+                    <span>{formatPrice(getPackageTotal())}</span>
                   </div>
                 )}
+
+                {selectedActivities.length > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">
+                      Activities ({selectedActivities.length})
+                    </span>
+                    <span>{formatPrice(getActivitiesTotal())}</span>
+                  </div>
+                )}
+
                 <hr />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>

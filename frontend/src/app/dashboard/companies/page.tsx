@@ -1,14 +1,15 @@
 // ================================
 // SUPER ADMIN — COMPANIES PAGE
 // Shows all surf companies on the platform.
-// Super admin can view details and toggle company status.
+// Super admin can view details, toggle company status,
+// and see subscription information.
 // ================================
 
 "use client";
 
 import { useState, useEffect } from "react";
 import { adminApi } from "@/lib/api";
-import { formatDate, getStatusColor, capitalize } from "@/lib/helpers";
+import { formatDate, formatPrice, getStatusColor, capitalize } from "@/lib/helpers";
 import { Company } from "@/types";
 
 export default function AdminCompaniesPage() {
@@ -39,6 +40,19 @@ export default function AdminCompaniesPage() {
     }
   }
 
+  // Activate or suspend a company's subscription
+  async function updateSubscription(
+    companyId: string,
+    status: string
+  ) {
+    try {
+      await adminApi.updateSubscription(companyId, { status });
+      loadCompanies();
+    } catch (error) {
+      console.error("Error updating subscription:", error);
+    }
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">All Companies</h1>
@@ -58,7 +72,8 @@ export default function AdminCompaniesPage() {
                 <th className="pb-3 font-medium">Company</th>
                 <th className="pb-3 font-medium">Owner</th>
                 <th className="pb-3 font-medium">Plan</th>
-                <th className="pb-3 font-medium">Status</th>
+                <th className="pb-3 font-medium">Sub. Status</th>
+                <th className="pb-3 font-medium">Active</th>
                 <th className="pb-3 font-medium">Created</th>
                 <th className="pb-3 font-medium">Actions</th>
               </tr>
@@ -84,7 +99,16 @@ export default function AdminCompaniesPage() {
                     </td>
                     <td className="py-3">
                       <span className="badge bg-blue-100 text-blue-800 capitalize">
-                        {company.subscription.plan}
+                        {company.subscription?.plan || "none"}
+                      </span>
+                    </td>
+                    <td className="py-3">
+                      <span
+                        className={`badge ${getStatusColor(
+                          company.subscription?.status || "inactive"
+                        )}`}
+                      >
+                        {capitalize(company.subscription?.status || "none")}
                       </span>
                     </td>
                     <td className="py-3">
@@ -100,16 +124,42 @@ export default function AdminCompaniesPage() {
                       {formatDate(company.createdAt)}
                     </td>
                     <td className="py-3">
-                      <button
-                        onClick={() => toggleCompany(company._id)}
-                        className={`text-xs ${
-                          company.isActive
-                            ? "text-red-600 hover:underline"
-                            : "text-green-600 hover:underline"
-                        }`}
-                      >
-                        {company.isActive ? "Deactivate" : "Activate"}
-                      </button>
+                      <div className="flex flex-col gap-1">
+                        {/* Toggle company active/inactive */}
+                        <button
+                          onClick={() => toggleCompany(company._id)}
+                          className={`text-xs ${
+                            company.isActive
+                              ? "text-red-600 hover:underline"
+                              : "text-green-600 hover:underline"
+                          }`}
+                        >
+                          {company.isActive ? "Deactivate" : "Activate"}
+                        </button>
+
+                        {/* Subscription actions */}
+                        {company.subscription?.status === "expired" && (
+                          <button
+                            onClick={() =>
+                              updateSubscription(company._id, "active")
+                            }
+                            className="text-xs text-blue-600 hover:underline"
+                          >
+                            Reactivate Sub.
+                          </button>
+                        )}
+                        {(company.subscription?.status === "active" ||
+                          company.subscription?.status === "trial") && (
+                          <button
+                            onClick={() =>
+                              updateSubscription(company._id, "expired")
+                            }
+                            className="text-xs text-orange-600 hover:underline"
+                          >
+                            Suspend Sub.
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

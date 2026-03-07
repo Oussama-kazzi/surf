@@ -15,6 +15,7 @@ import User from "./models/User";
 import Company from "./models/Company";
 import Room from "./models/Room";
 import Package from "./models/Package";
+import Subscription, { SUBSCRIPTION_PLANS } from "./models/Subscription";
 
 dotenv.config();
 
@@ -206,6 +207,36 @@ async function seed() {
 
       await Package.insertMany(packages);
       console.log("✅ Sample packages created (4 packages)");
+
+      // ================================
+      // CREATE SAMPLE SUBSCRIPTION
+      // Give the sample company a 15-day trial on the "pro" plan.
+      // This simulates what happens when a new company registers.
+      // ================================
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 15); // 15 days from now
+
+      const subscription = new Subscription({
+        companyId: company._id,
+        plan: "pro",
+        status: "trial",
+        pricePerMonth: SUBSCRIPTION_PLANS.pro.pricePerMonth,
+        startDate: new Date(),
+        nextBillingDate: trialEnd,
+      });
+      await subscription.save();
+
+      // Update the company with subscription info
+      company.subscriptionId = subscription._id as any;
+      company.subscription = {
+        plan: "pro",
+        status: "trial",
+        startDate: new Date(),
+        endDate: trialEnd,
+      };
+      await company.save();
+
+      console.log("✅ Sample subscription created (15-day Pro trial)");
     } else {
       console.log("ℹ️  Sample company already exists");
     }

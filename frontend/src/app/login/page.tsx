@@ -27,10 +27,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      const loggedInUser = await login(email, password);
 
-      // After login, redirect to dashboard
-      router.push("/dashboard");
+      // Redirect based on role
+      if (loggedInUser.role === "super_admin") {
+        router.push("/dashboard");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setError(err.message || "Login failed. Please try again.");
     } finally {

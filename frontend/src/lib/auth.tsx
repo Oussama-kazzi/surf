@@ -20,7 +20,7 @@ import { User } from "@/types";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   register: (data: {
     email: string;
     password: string;
@@ -35,7 +35,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  login: async () => {},
+  login: async () => ({} as User),
   register: async () => {},
   logout: () => {},
 });
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Login function
-  async function login(email: string, password: string) {
+  async function login(email: string, password: string): Promise<User> {
     const data = await authApi.login({ email, password });
 
     // Save the token to localStorage
@@ -84,6 +84,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Set the user in state
     setUser(data.user);
+
+    return data.user;
   }
 
   // Register function

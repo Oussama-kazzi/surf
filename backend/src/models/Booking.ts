@@ -7,11 +7,20 @@
 
 import mongoose, { Schema, Document } from "mongoose";
 
+// A single activity+session booked as part of a booking
+export interface IBookingActivity {
+  activityId: mongoose.Types.ObjectId;
+  sessionId: mongoose.Types.ObjectId;
+  price: number; // Price in cents at the time of booking
+}
+
 export interface IBooking extends Document {
   companyId: mongoose.Types.ObjectId;
   customerId: mongoose.Types.ObjectId;
   roomId: mongoose.Types.ObjectId;
   packageId?: mongoose.Types.ObjectId;
+  // Activities added to this booking
+  activities: IBookingActivity[];
   checkIn: Date;
   checkOut: Date;
   numberOfGuests: number;
@@ -19,7 +28,8 @@ export interface IBooking extends Document {
   // Price breakdown (all in cents)
   roomTotal: number; // pricePerNight * numberOfNights
   packageTotal: number; // package price * numberOfGuests
-  totalPrice: number; // roomTotal + packageTotal
+  activitiesTotal: number; // sum of all activity prices
+  totalPrice: number; // roomTotal + packageTotal + activitiesTotal
   status: "pending" | "confirmed" | "cancelled" | "completed";
   paymentStatus: "unpaid" | "partial" | "paid" | "refunded";
   notes?: string;
@@ -52,6 +62,26 @@ const bookingSchema = new Schema<IBooking>(
       ref: "Package",
       default: null,
     },
+    // Activities booked (optional array of activity+session pairs)
+    activities: [
+      {
+        activityId: {
+          type: Schema.Types.ObjectId,
+          ref: "Activity",
+          required: true,
+        },
+        sessionId: {
+          type: Schema.Types.ObjectId,
+          ref: "Session",
+          required: true,
+        },
+        price: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+      },
+    ],
     // Check-in and check-out dates
     checkIn: {
       type: Date,
@@ -81,6 +111,10 @@ const bookingSchema = new Schema<IBooking>(
       required: true,
     },
     packageTotal: {
+      type: Number,
+      default: 0,
+    },
+    activitiesTotal: {
       type: Number,
       default: 0,
     },
