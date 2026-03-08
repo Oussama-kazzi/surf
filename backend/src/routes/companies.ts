@@ -80,6 +80,7 @@ router.put(
         city,
         country,
         website,
+        paymentSettings,
       } = req.body;
 
       const company = await Company.findById(req.user!.companyId);
@@ -102,6 +103,7 @@ router.put(
       if (city !== undefined) company.city = city;
       if (country !== undefined) company.country = country;
       if (website !== undefined) company.website = website;
+      if (paymentSettings !== undefined) (company as any).paymentSettings = paymentSettings;
 
       await company.save();
 

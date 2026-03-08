@@ -26,6 +26,14 @@ export interface ICompany extends Document {
     startDate: Date;
     endDate?: Date;
   };
+  paymentSettings?: {
+    method: "manual" | "stripe" | "bank_transfer";
+    manualInstructions: string;
+    bankName: string;
+    iban: string;
+    swift: string;
+    accountHolder: string;
+  };
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -122,6 +130,22 @@ const companySchema = new Schema<ICompany>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    // Payment configuration set by the company admin
+    paymentSettings: {
+      method: {
+        type: String,
+        enum: ["manual", "stripe", "bank_transfer"],
+        default: "manual",
+      },
+      manualInstructions: {
+        type: String,
+        default: "Please pay at the reception when you arrive.",
+      },
+      bankName: { type: String, default: "" },
+      iban: { type: String, default: "" },
+      swift: { type: String, default: "" },
+      accountHolder: { type: String, default: "" },
     },
   },
   {

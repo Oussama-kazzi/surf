@@ -42,6 +42,14 @@ export interface Company {
     startDate: string;
     endDate?: string;
   };
+  paymentSettings?: {
+    method: "manual" | "stripe" | "bank_transfer";
+    manualInstructions: string;
+    bankName: string;
+    iban: string;
+    swift: string;
+    accountHolder: string;
+  };
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

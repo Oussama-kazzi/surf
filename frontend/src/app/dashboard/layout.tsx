@@ -99,7 +99,6 @@ export default function DashboardLayout({
     { label: "Sessions", href: "/dashboard/sessions", icon: "⏰", section: "manage" },
     { label: "Customers", href: "/dashboard/customers", icon: "👥", section: "people" },
     { label: "Team", href: "/dashboard/team", icon: "👤", section: "people" },
-    { label: "Payments", href: "/dashboard/payments", icon: "💳", section: "billing" },
     { label: "Subscription", href: "/dashboard/subscription", icon: "💎", section: "billing" },
     { label: "Settings", href: "/dashboard/settings", icon: "⚙️", section: "billing" },
   ];

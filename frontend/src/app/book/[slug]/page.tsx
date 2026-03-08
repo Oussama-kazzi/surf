@@ -1,5 +1,5 @@
 // ================================
-// PUBLIC BOOKING PAGE — 7-STEP WIZARD
+// PUBLIC BOOKING PAGE — 8-STEP WIZARD
 // URL: /book/[slug]
 //
 // STEPS:
@@ -10,6 +10,7 @@
 // 5. Select Sessions for chosen activities
 // 6. Customer Information
 // 7. Review & Confirm
+// 8. Payment
 // ================================
 
 "use client";
@@ -264,6 +265,7 @@ export default function BookingPage() {
     "Sessions",
     "Details",
     "Review",
+    "Payment",
   ];
 
   function goToStep(target: number) {
@@ -1156,11 +1158,10 @@ export default function BookingPage() {
                   ← Back
                 </button>
                 <button
-                  onClick={submitBooking}
+                  onClick={() => goToStep(8)}
                   className="btn-primary px-8"
-                  disabled={loading}
                 >
-                  {loading ? "Booking..." : "Confirm Booking"}
+                  Continue to Payment
                 </button>
               </div>
             </div>
@@ -1194,6 +1195,159 @@ export default function BookingPage() {
                   </div>
                 )}
 
+                <hr className="border-sand-200" />
+                <div className="flex justify-between text-lg font-bold">
+                  <span className="text-gray-900">Total</span>
+                  <span className="text-ocean-600">
+                    {formatPrice(getTotalPrice())}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* STEP 8: PAYMENT */}
+        {step === 8 && (
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 card">
+              <h2 className="text-section-title text-gray-900 mb-1">Payment</h2>
+              <p className="text-gray-400 text-sm mb-6">
+                Complete your payment to finalize the booking.
+              </p>
+
+              {/* Manual Payment */}
+              {(!company.paymentSettings || company.paymentSettings.method === "manual") && (
+                <div className="p-6 bg-sand-50 rounded-xl border border-sand-100">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                      <span className="text-2xl">💵</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Pay on Arrival</p>
+                      <p className="text-sm text-gray-500">Manual payment</p>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 border border-sand-200">
+                    <p className="text-gray-700 whitespace-pre-line">
+                      {company.paymentSettings?.manualInstructions ||
+                        "Please pay at the reception when you arrive."}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Stripe */}
+              {company.paymentSettings?.method === "stripe" && (
+                <div className="p-6 bg-purple-50 rounded-xl border border-purple-100">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                      <span className="text-2xl">💳</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Online Payment</p>
+                      <p className="text-sm text-gray-500">Secure card payment via Stripe</p>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 border border-purple-100 text-center">
+                    <p className="text-gray-500 text-sm mb-3">
+                      Stripe integration coming soon. Your booking will be confirmed and you can pay later.
+                    </p>
+                    <div className="inline-block px-6 py-2.5 bg-purple-100 text-purple-400 rounded-lg text-sm font-medium cursor-not-allowed">
+                      Pay Now (Coming Soon)
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Bank Transfer */}
+              {company.paymentSettings?.method === "bank_transfer" && (
+                <div className="p-6 bg-ocean-50 rounded-xl border border-ocean-100">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-ocean-100 flex items-center justify-center">
+                      <span className="text-2xl">🏦</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Bank Transfer</p>
+                      <p className="text-sm text-gray-500">Transfer to the account below</p>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-5 border border-ocean-200 space-y-3">
+                    {company.paymentSettings.bankName && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Bank</span>
+                        <span className="font-medium text-gray-900">{company.paymentSettings.bankName}</span>
+                      </div>
+                    )}
+                    {company.paymentSettings.accountHolder && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Account Holder</span>
+                        <span className="font-medium text-gray-900">{company.paymentSettings.accountHolder}</span>
+                      </div>
+                    )}
+                    {company.paymentSettings.iban && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">IBAN</span>
+                        <span className="font-mono font-medium text-gray-900">{company.paymentSettings.iban}</span>
+                      </div>
+                    )}
+                    {company.paymentSettings.swift && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">SWIFT / BIC</span>
+                        <span className="font-mono font-medium text-gray-900">{company.paymentSettings.swift}</span>
+                      </div>
+                    )}
+                    <hr className="border-ocean-100" />
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Amount to Transfer</span>
+                      <span className="font-bold text-ocean-600">{formatPrice(getTotalPrice())}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-3">
+                    Please include your name as the payment reference.
+                  </p>
+                </div>
+              )}
+
+              <div className="flex gap-4 mt-6">
+                <button onClick={() => goToStep(7)} className="btn-secondary">
+                  ← Back
+                </button>
+                <button
+                  onClick={submitBooking}
+                  className="btn-primary px-8"
+                  disabled={loading}
+                >
+                  {loading ? "Booking..." : "Complete Booking"}
+                </button>
+              </div>
+            </div>
+
+            {/* Price Summary */}
+            <div className="card h-fit bg-sand-50 border border-sand-100">
+              <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">
+                    Room ({calculateNights(checkIn, checkOut)} nights)
+                  </span>
+                  <span className="font-medium text-gray-700">{formatPrice(getRoomTotal())}</span>
+                </div>
+                {selectedPackage && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">
+                      Package ({guests} guest{guests !== 1 ? "s" : ""})
+                    </span>
+                    <span className="font-medium text-gray-700">{formatPrice(getPackageTotal())}</span>
+                  </div>
+                )}
+                {selectedActivities.length > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">
+                      Activities ({selectedActivities.length})
+                    </span>
+                    <span className="font-medium text-gray-700">{formatPrice(getActivitiesTotal())}</span>
+                  </div>
+                )}
                 <hr className="border-sand-200" />
                 <div className="flex justify-between text-lg font-bold">
                   <span className="text-gray-900">Total</span>
