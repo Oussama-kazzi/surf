@@ -261,6 +261,45 @@ export interface TeamMember {
 }
 
 // ================================
+// INVOICE
+// Auto-generated after booking payment
+// ================================
+export interface InvoicePriceBreakdown {
+  roomName: string;
+  roomPricePerNight: number;
+  numberOfNights: number;
+  roomTotal: number;
+  packageName?: string;
+  packagePricePerPerson?: number;
+  numberOfGuests: number;
+  packageTotal: number;
+  activities: { name: string; price: number }[];
+  activitiesTotal: number;
+}
+
+export interface Invoice {
+  _id: string;
+  invoiceNumber: string;
+  bookingId: string;
+  companyId: string;
+  companyName: string;
+  customerName: string;
+  customerEmail: string;
+  roomName: string;
+  packageName?: string;
+  sessions: { activityName: string; date: string; time: string }[];
+  numberOfNights: number;
+  numberOfGuests: number;
+  priceBreakdown: InvoicePriceBreakdown;
+  totalAmount: number;
+  paymentMethod: "pay_on_arrival" | "stripe" | "paypal";
+  paymentStatus: "unpaid" | "paid";
+  bookingDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ================================
 // API RESPONSE TYPES
 // What the API returns
 // ================================

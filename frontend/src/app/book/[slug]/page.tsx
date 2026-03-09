@@ -16,7 +16,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   companyApi,
   roomApi,
@@ -24,6 +24,7 @@ import {
   bookingApi,
   activityApi,
   sessionApi,
+  invoiceApi,
 } from "@/lib/api";
 import { formatPrice, calculateNights, formatDate } from "@/lib/helpers";
 import { Company, Room, SurfPackage, Activity, Session } from "@/types";
@@ -36,6 +37,7 @@ interface SelectedActivity {
 
 export default function BookingPage() {
   const params = useParams();
+  const router = useRouter();
   const slug = params.slug as string;
 
   // ================================
@@ -73,6 +75,9 @@ export default function BookingPage() {
     phone: "",
     notes: "",
   });
+
+  // Step 8: Payment method
+  const [paymentMethod, setPaymentMethod] = useState<"pay_on_arrival" | "stripe" | "paypal">("pay_on_arrival");
 
   // ================================
   // LOAD COMPANY DATA
@@ -208,7 +213,7 @@ export default function BookingPage() {
   }
 
   // ================================
-  // STEP 7: SUBMIT BOOKING
+  // STEP 8: SUBMIT BOOKING + GENERATE INVOICE
   // ================================
   async function submitBooking() {
     if (
@@ -231,7 +236,8 @@ export default function BookingPage() {
           sessionId: sa.session!._id,
         }));
 
-      await bookingApi.create({
+      // 1. Create the booking
+      const bookingData = await bookingApi.create({
         companyId: company!._id,
         roomId: selectedRoom!._id,
         packageId: selectedPackage?._id || null,
@@ -246,7 +252,16 @@ export default function BookingPage() {
         notes: customerInfo.notes,
       });
 
-      setSuccess(true);
+      const bookingId = bookingData.booking._id;
+
+      // 2. Generate the invoice
+      await invoiceApi.generate({
+        bookingId,
+        paymentMethod,
+      });
+
+      // 3. Redirect to confirmation page
+      router.push(`/booking/confirmation/${bookingId}`);
     } catch (err: any) {
       setError(err.message || "Booking failed. Please try again.");
     } finally {
@@ -1212,98 +1227,84 @@ export default function BookingPage() {
             <div className="md:col-span-2 card">
               <h2 className="text-section-title text-gray-900 mb-1">Payment</h2>
               <p className="text-gray-400 text-sm mb-6">
-                Complete your payment to finalize the booking.
+                Choose how you&apos;d like to pay for your booking.
               </p>
 
-              {/* Manual Payment */}
-              {(!company.paymentSettings || company.paymentSettings.method === "manual") && (
-                <div className="p-6 bg-sand-50 rounded-xl border border-sand-100">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <span className="text-2xl">💵</span>
+              {/* Payment Method Selector */}
+              <div className="space-y-3 mb-6">
+                {([
+                  {
+                    id: "pay_on_arrival" as const,
+                    icon: "💵",
+                    label: "Pay on Arrival",
+                    desc: "Pay at the surf camp when you check in",
+                  },
+                  {
+                    id: "stripe" as const,
+                    icon: "💳",
+                    label: "Stripe",
+                    desc: "Secure online card payment",
+                  },
+                  {
+                    id: "paypal" as const,
+                    icon: "🅿️",
+                    label: "PayPal",
+                    desc: "Pay with your PayPal account",
+                  },
+                ]).map((method) => (
+                  <button
+                    key={method.id}
+                    type="button"
+                    onClick={() => setPaymentMethod(method.id)}
+                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all ${
+                      paymentMethod === method.id
+                        ? "border-ocean-500 bg-ocean-50/50 shadow-sm"
+                        : "border-gray-100 hover:border-ocean-200"
+                    }`}
+                  >
+                    <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-2xl shrink-0">
+                      {method.icon}
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">Pay on Arrival</p>
-                      <p className="text-sm text-gray-500">Manual payment</p>
+                      <p className="font-semibold text-gray-900">{method.label}</p>
+                      <p className="text-sm text-gray-500">{method.desc}</p>
                     </div>
-                  </div>
-                  <div className="bg-white rounded-lg p-4 border border-sand-200">
-                    <p className="text-gray-700 whitespace-pre-line">
-                      {company.paymentSettings?.manualInstructions ||
-                        "Please pay at the reception when you arrive."}
-                    </p>
-                  </div>
+                    <div className="ml-auto">
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        paymentMethod === method.id
+                          ? "border-ocean-500 bg-ocean-500"
+                          : "border-gray-300"
+                      }`}>
+                        {paymentMethod === method.id && (
+                          <div className="w-2 h-2 rounded-full bg-white"></div>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Payment method details */}
+              {paymentMethod === "pay_on_arrival" && (
+                <div className="p-4 bg-sand-50 rounded-xl border border-sand-100 mb-6">
+                  <p className="text-sm text-gray-600">
+                    Your booking will be confirmed immediately. Please pay at the reception when you arrive.
+                  </p>
                 </div>
               )}
 
-              {/* Stripe */}
-              {company.paymentSettings?.method === "stripe" && (
-                <div className="p-6 bg-purple-50 rounded-xl border border-purple-100">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                      <span className="text-2xl">💳</span>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900">Online Payment</p>
-                      <p className="text-sm text-gray-500">Secure card payment via Stripe</p>
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-lg p-4 border border-purple-100 text-center">
-                    <p className="text-gray-500 text-sm mb-3">
-                      Stripe integration coming soon. Your booking will be confirmed and you can pay later.
-                    </p>
-                    <div className="inline-block px-6 py-2.5 bg-purple-100 text-purple-400 rounded-lg text-sm font-medium cursor-not-allowed">
-                      Pay Now (Coming Soon)
-                    </div>
-                  </div>
+              {paymentMethod === "stripe" && (
+                <div className="p-4 bg-purple-50 rounded-xl border border-purple-100 mb-6">
+                  <p className="text-sm text-gray-600">
+                    Stripe integration coming soon. Your booking will be created and you can pay later.
+                  </p>
                 </div>
               )}
 
-              {/* Bank Transfer */}
-              {company.paymentSettings?.method === "bank_transfer" && (
-                <div className="p-6 bg-ocean-50 rounded-xl border border-ocean-100">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-ocean-100 flex items-center justify-center">
-                      <span className="text-2xl">🏦</span>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900">Bank Transfer</p>
-                      <p className="text-sm text-gray-500">Transfer to the account below</p>
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-lg p-5 border border-ocean-200 space-y-3">
-                    {company.paymentSettings.bankName && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Bank</span>
-                        <span className="font-medium text-gray-900">{company.paymentSettings.bankName}</span>
-                      </div>
-                    )}
-                    {company.paymentSettings.accountHolder && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Account Holder</span>
-                        <span className="font-medium text-gray-900">{company.paymentSettings.accountHolder}</span>
-                      </div>
-                    )}
-                    {company.paymentSettings.iban && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">IBAN</span>
-                        <span className="font-mono font-medium text-gray-900">{company.paymentSettings.iban}</span>
-                      </div>
-                    )}
-                    {company.paymentSettings.swift && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">SWIFT / BIC</span>
-                        <span className="font-mono font-medium text-gray-900">{company.paymentSettings.swift}</span>
-                      </div>
-                    )}
-                    <hr className="border-ocean-100" />
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Amount to Transfer</span>
-                      <span className="font-bold text-ocean-600">{formatPrice(getTotalPrice())}</span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-3">
-                    Please include your name as the payment reference.
+              {paymentMethod === "paypal" && (
+                <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 mb-6">
+                  <p className="text-sm text-gray-600">
+                    PayPal integration coming soon. Your booking will be created and you can pay later.
                   </p>
                 </div>
               )}
@@ -1317,7 +1318,7 @@ export default function BookingPage() {
                   className="btn-primary px-8"
                   disabled={loading}
                 >
-                  {loading ? "Booking..." : "Complete Booking"}
+                  {loading ? "Processing..." : "Complete Booking"}
                 </button>
               </div>
             </div>

@@ -22,6 +22,7 @@ import adminRoutes from "./routes/admin";
 import subscriptionRoutes from "./routes/subscriptions";
 import activityRoutes from "./routes/activities";
 import sessionRoutes from "./routes/sessions";
+import invoiceRoutes from "./routes/invoices";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -63,6 +64,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/sessions", sessionRoutes);
+app.use("/api/invoices", invoiceRoutes);
 
 // Simple health check route
 app.get("/api/health", (_req, res) => {

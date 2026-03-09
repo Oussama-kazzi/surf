@@ -258,6 +258,21 @@ export const sessionApi = {
 };
 
 // ================================
+// INVOICE API
+// ================================
+export const invoiceApi = {
+  // Generate invoice after booking
+  generate: (data: { bookingId: string; paymentMethod: string }) =>
+    apiRequest("/invoices/generate", { method: "POST", body: JSON.stringify(data) }),
+
+  // Get invoice by booking ID
+  getByBooking: (bookingId: string) => apiRequest(`/invoices/${bookingId}`),
+
+  // Get PDF download URL
+  getPdfUrl: (invoiceId: string) => `/api/invoices/${invoiceId}/pdf`,
+};
+
+// ================================
 // ADMIN API (Super Admin)
 // ================================
 export const adminApi = {
