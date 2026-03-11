@@ -42,11 +42,10 @@ export default function BookingConfirmationPage() {
   // ================================
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ocean-50 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="text-5xl mb-4 animate-bounce">🏄</div>
           <div className="flex items-center gap-3 justify-center">
-            <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+            <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
             <span className="loading-text">Loading confirmation...</span>
           </div>
         </div>
@@ -59,7 +58,7 @@ export default function BookingConfirmationPage() {
   // ================================
   if (error || !invoice) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ocean-50 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="card max-w-md w-full text-center">
           <div className="text-5xl mb-4">😕</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -88,14 +87,11 @@ export default function BookingConfirmationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-ocean-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="gradient-ocean text-white py-10 relative overflow-hidden">
+      <div className="bg-gray-900 text-white py-10 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 1440 320\'%3E%3Cpath fill=\'%23ffffff\' d=\'M0,160L48,176C96,192,192,224,288,218.7C384,213,480,171,576,149.3C672,128,768,128,864,149.3C960,171,1056,213,1152,218.7C1248,224,1344,192,1392,176L1440,160L1440,320L0,320Z\'/%3E%3C/svg%3E")' }}></div>
         <div className="max-w-3xl mx-auto px-4 text-center relative">
-          <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
-            <span className="text-4xl">🎉</span>
-          </div>
           <h1 className="text-3xl font-bold tracking-tight">
             Booking Confirmed!
           </h1>
@@ -223,7 +219,7 @@ export default function BookingConfirmationPage() {
             <hr className="border-gray-100" />
             <div className="flex justify-between">
               <p className="text-lg font-bold text-gray-900">Total</p>
-              <p className="text-lg font-bold text-ocean-600">
+              <p className="text-lg font-bold text-gray-900">
                 {formatPrice(invoice.totalAmount)}
               </p>
             </div>
@@ -240,9 +236,8 @@ export default function BookingConfirmationPage() {
                 {invoice.sessions.map((sess, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 p-3 bg-ocean-50 rounded-lg border border-ocean-100"
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
                   >
-                    <span className="text-lg">🏄</span>
                     <div>
                       <p className="font-medium text-gray-900 text-sm">
                         {sess.activityName}
@@ -265,7 +260,7 @@ export default function BookingConfirmationPage() {
               rel="noopener noreferrer"
               className="btn-primary inline-flex items-center gap-2"
             >
-              📄 Download Invoice PDF
+              Download Invoice PDF
             </a>
             <a
               href="/"
@@ -280,7 +275,6 @@ export default function BookingConfirmationPage() {
         {invoice.paymentStatus === "unpaid" && (
           <div className="p-5 bg-amber-50 rounded-xl border border-amber-200">
             <div className="flex items-start gap-3">
-              <span className="text-xl mt-0.5">⚠️</span>
               <div>
                 <p className="font-semibold text-amber-800">Payment Pending</p>
                 <p className="text-sm text-amber-700 mt-1">

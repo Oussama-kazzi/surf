@@ -102,7 +102,7 @@ export default function AdminSubscriptionsPage() {
         </div>
         <div className="stat-card">
           <p className="text-gray-400 text-sm">Total Payments</p>
-          <p className="text-3xl font-bold mt-1 text-ocean-600">
+          <p className="text-3xl font-bold mt-1 text-gray-900">
             {payments.length}
           </p>
         </div>
@@ -126,8 +126,8 @@ export default function AdminSubscriptionsPage() {
           onClick={() => setActiveTab("subscriptions")}
           className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
             activeTab === "subscriptions"
-              ? "bg-ocean-600 text-white shadow-md"
-              : "bg-white text-gray-500 hover:bg-sand-50 border border-gray-100"
+              ? "bg-gray-900 text-white shadow-md"
+              : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-100"
           }`}
         >
           Subscriptions ({subscriptions.length})
@@ -136,8 +136,8 @@ export default function AdminSubscriptionsPage() {
           onClick={() => setActiveTab("payments")}
           className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
             activeTab === "payments"
-              ? "bg-ocean-600 text-white shadow-md"
-              : "bg-white text-gray-500 hover:bg-sand-50 border border-gray-100"
+              ? "bg-gray-900 text-white shadow-md"
+              : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-100"
           }`}
         >
           Payment History ({payments.length})
@@ -147,13 +147,12 @@ export default function AdminSubscriptionsPage() {
       {/* Content */}
       {loading ? (
         <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
           <span className="loading-text">Loading...</span>
         </div>
       ) : activeTab === "subscriptions" ? (
         subscriptions.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-state-icon">💎</div>
             <p className="empty-state-text">No subscriptions yet.</p>
           </div>
         ) : (
@@ -224,7 +223,6 @@ export default function AdminSubscriptionsPage() {
       ) : (
         payments.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-state-icon">💳</div>
             <p className="empty-state-text">No subscription payments yet.</p>
           </div>
         ) : (

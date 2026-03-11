@@ -122,7 +122,7 @@ export default function SubscriptionPage() {
   if (loading) {
     return (
       <div className="flex items-center gap-3 py-12">
-        <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
         <span className="loading-text">Loading subscription...</span>
       </div>
     );
@@ -147,7 +147,7 @@ export default function SubscriptionPage() {
 
       {/* Current Subscription Status */}
       <div className="card mb-8">
-        <h2 className="text-section-title text-gray-900 mb-5">Current Subscription</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-5">Current Subscription</h2>
 
         {subscription ? (
           <div className="space-y-3">
@@ -212,8 +212,8 @@ export default function SubscriptionPage() {
         <div className="alert-warning mb-8">
           <h3 className="font-bold text-lg mb-2">
             {isExpired
-              ? "⚠️ Your Subscription Has Expired"
-              : "⚠️ Your Subscription Is Canceled"}
+              ? "Your Subscription Has Expired"
+              : "Your Subscription Is Canceled"}
           </h3>
           <p className="mb-4">
             You cannot create new bookings until you renew or subscribe to a new plan.
@@ -228,7 +228,7 @@ export default function SubscriptionPage() {
       )}
 
       {/* Available Plans */}
-      <h2 className="text-section-title text-gray-900 mb-5">Available Plans</h2>
+      <h2 className="text-lg font-semibold text-gray-900 mb-5">Available Plans</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map((plan) => {
@@ -239,14 +239,14 @@ export default function SubscriptionPage() {
               key={plan.id}
               className={`card border-2 transition-all ${
                 isCurrentPlan
-                  ? "border-ocean-500 bg-ocean-50/50 shadow-lg"
-                  : "border-gray-100 hover:border-ocean-200 hover:shadow-card-hover"
+                  ? "border-gray-500 bg-gray-50/50 shadow-lg"
+                  : "border-gray-100 hover:border-gray-200 hover:shadow-md"
               }`}
             >
               <div className="text-center mb-5">
                 <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
                 <div className="mt-2">
-                  <span className="text-3xl font-bold text-ocean-600">
+                  <span className="text-3xl font-bold text-gray-900">
                     {formatPrice(plan.pricePerMonth)}
                   </span>
                   <span className="text-gray-400">/month</span>
@@ -265,7 +265,7 @@ export default function SubscriptionPage() {
               {isCurrentPlan && (isActive || isTrial) ? (
                 <button
                   disabled
-                  className="w-full py-2.5 px-4 bg-ocean-100 text-ocean-700 rounded-xl font-medium cursor-default"
+                  className="w-full py-2.5 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium cursor-default"
                 >
                   Current Plan
                 </button>
@@ -273,7 +273,7 @@ export default function SubscriptionPage() {
                 <button
                   onClick={() => handleSubscribe(plan.id)}
                   disabled={actionLoading}
-                  className="w-full py-2.5 px-4 bg-ocean-600 text-white rounded-xl font-medium hover:bg-ocean-700 transition-colors disabled:opacity-50"
+                  className="w-full py-2.5 px-4 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
                 >
                   {actionLoading
                     ? "Processing..."

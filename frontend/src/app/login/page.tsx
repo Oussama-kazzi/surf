@@ -43,18 +43,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ocean-50 to-white px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="card max-w-md w-full">
-        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 gradient-ocean rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-            <span className="text-3xl">🏄</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mt-4">
+          <h1 className="text-2xl font-semibold text-gray-900">
             Log in to SurfBook
           </h1>
-          <p className="text-gray-400 mt-1">
-            Welcome back! Enter your credentials.
+          <p className="text-gray-500 mt-1 text-sm">
+            Welcome back. Enter your credentials.
           </p>
         </div>
 
@@ -105,9 +101,9 @@ export default function LoginPage() {
         </form>
 
         {/* Register link */}
-        <p className="text-center text-gray-400 text-sm mt-6">
+        <p className="text-center text-gray-500 text-sm mt-6">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-ocean-600 hover:text-ocean-700 font-medium">
+          <Link href="/register" className="text-gray-900 hover:underline font-medium">
             Sign up
           </Link>
         </p>

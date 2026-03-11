@@ -204,7 +204,7 @@ export default function SessionsPage() {
                 setFilterActivity("");
                 setFilterDate("");
               }}
-              className="text-sm font-medium text-ocean-600 hover:text-ocean-800 transition-colors pb-2"
+              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors pb-2"
             >
               Clear Filters
             </button>
@@ -215,7 +215,7 @@ export default function SessionsPage() {
       {/* Create / Edit Form */}
       {showForm && canManage && (
         <div className="form-card">
-          <h2 className="text-section-title text-gray-900 mb-5">
+          <h2 className="text-lg font-semibold text-gray-900 mb-5">
             {editingId ? "Edit Session" : "New Session"}
           </h2>
 
@@ -296,12 +296,11 @@ export default function SessionsPage() {
       {/* Sessions List */}
       {loading ? (
         <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
           <span className="loading-text">Loading sessions...</span>
         </div>
       ) : sessions.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">📅</div>
           <p className="empty-state-text">No sessions scheduled. Create your first one!</p>
         </div>
       ) : (
@@ -355,7 +354,7 @@ export default function SessionsPage() {
                         <div className="flex gap-3">
                           <button
                             onClick={() => startEdit(session)}
-                            className="text-sm font-medium text-ocean-600 hover:text-ocean-800 transition-colors"
+                            className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
                           >
                             Edit
                           </button>

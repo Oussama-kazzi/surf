@@ -71,13 +71,11 @@ export default function BookingsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <div className="py-12">
           <span className="loading-text">Loading bookings...</span>
         </div>
       ) : bookings.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">📅</div>
           <p className="empty-state-text">No bookings found.</p>
         </div>
       ) : (
@@ -137,7 +135,7 @@ export default function BookingsPage() {
                     {(user?.role === "admin" || user?.role === "manager") && (
                       <td className="table-cell">
                         <select
-                          className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-ocean-300"
+                          className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-gray-300"
                           value={booking.status}
                           onChange={(e) =>
                             updateStatus(booking._id, e.target.value)

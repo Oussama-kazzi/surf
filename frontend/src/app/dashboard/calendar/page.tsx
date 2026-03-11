@@ -114,7 +114,7 @@ export default function CalendarPage() {
   if (loading) {
     return (
       <div className="flex items-center gap-3 py-12">
-        <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
         <span className="loading-text">Loading calendar...</span>
       </div>
     );
@@ -168,7 +168,7 @@ export default function CalendarPage() {
           <span className="text-gray-500">Available</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded-md bg-ocean-100 border border-ocean-300"></div>
+          <div className="w-4 h-4 rounded-md bg-blue-100 border border-blue-300"></div>
           <span className="text-gray-500">Confirmed</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -186,7 +186,7 @@ export default function CalendarPage() {
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr>
-              <th className="text-left p-2 border-b border-r border-gray-100 bg-sand-50 sticky left-0 z-10 min-w-[140px]">
+              <th className="text-left p-2 border-b border-r border-gray-100 bg-gray-50 sticky left-0 z-10 min-w-[140px]">
                 Room
               </th>
               {dates.map((date) => {
@@ -199,16 +199,16 @@ export default function CalendarPage() {
                     key={date.toISOString()}
                     className={`p-2 border-b border-gray-100 text-center min-w-[80px] ${
                       isToday
-                        ? "bg-ocean-50 font-bold"
+                        ? "bg-gray-50 font-bold"
                         : isWeekend
-                        ? "bg-sand-50"
+                        ? "bg-gray-50"
                         : ""
                     }`}
                   >
                     <div className="text-xs text-gray-500">
                       {date.toLocaleDateString("en-US", { weekday: "short" })}
                     </div>
-                    <div className={isToday ? "text-ocean-700" : ""}>
+                    <div className={isToday ? "text-gray-700" : ""}>
                       {date.getDate()}
                     </div>
                     <div className="text-xs text-gray-400">
@@ -245,7 +245,7 @@ export default function CalendarPage() {
 
                     switch (booking.status) {
                       case "confirmed":
-                        bgColor = "bg-ocean-100";
+                        bgColor = "bg-blue-100";
                         break;
                       case "pending":
                         bgColor = "bg-amber-100";
@@ -275,7 +275,7 @@ export default function CalendarPage() {
                     <td
                       key={date.toISOString()}
                       className={`p-1 border-b border-gray-50 text-center cursor-default rounded-sm ${bgColor} ${
-                        isToday ? "ring-2 ring-inset ring-ocean-400" : ""
+                        isToday ? "ring-2 ring-inset ring-gray-400" : ""
                       }`}
                       title={title}
                     >
@@ -295,7 +295,6 @@ export default function CalendarPage() {
 
       {rooms.length === 0 && (
         <div className="empty-state mt-4">
-          <div className="empty-state-icon">🏠</div>
           <p className="empty-state-text">No rooms found. Create rooms first.</p>
         </div>
       )}

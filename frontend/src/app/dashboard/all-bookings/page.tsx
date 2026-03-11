@@ -54,12 +54,11 @@ export default function AdminAllBookingsPage() {
 
       {loading ? (
         <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
           <span className="loading-text">Loading bookings...</span>
         </div>
       ) : bookings.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">📋</div>
           <p className="empty-state-text">No bookings found.</p>
         </div>
       ) : (

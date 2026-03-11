@@ -131,7 +131,7 @@ export default function ActivitiesPage() {
       {/* Create / Edit Form */}
       {showForm && canManage && (
         <div className="form-card">
-          <h2 className="text-section-title text-gray-900 mb-5">
+          <h2 className="text-lg font-semibold text-gray-900 mb-5">
             {editingId ? "Edit Activity" : "New Activity"}
           </h2>
 
@@ -211,12 +211,11 @@ export default function ActivitiesPage() {
       {/* Activities List */}
       {loading ? (
         <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
           <span className="loading-text">Loading activities...</span>
         </div>
       ) : activities.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">🏄</div>
           <p className="empty-state-text">No activities yet. Create your first one!</p>
         </div>
       ) : (
@@ -228,14 +227,14 @@ export default function ActivitiesPage() {
             >
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="text-card-title text-gray-900">{activity.name}</h3>
+                  <h3 className="text-base font-semibold text-gray-900">{activity.name}</h3>
                   {!activity.isActive && (
                     <span className="badge bg-red-50 text-red-700 text-xs mt-1">
                       Inactive
                     </span>
                   )}
                 </div>
-                <p className="text-xl font-bold text-ocean-600">
+                <p className="text-xl font-bold text-gray-900">
                   {formatPrice(activity.price)}
                 </p>
               </div>
@@ -245,15 +244,15 @@ export default function ActivitiesPage() {
               </p>
 
               <div className="flex gap-4 text-sm text-gray-400 mb-4">
-                <span>⏱ {activity.duration} min</span>
-                <span>👥 Max {activity.capacity}</span>
+                <span>{activity.duration} min</span>
+                <span>Max {activity.capacity}</span>
               </div>
 
               {canManage && (
                 <div className="flex gap-3 pt-3 border-t border-gray-100">
                   <button
                     onClick={() => startEdit(activity)}
-                    className="text-sm font-medium text-ocean-600 hover:text-ocean-800 transition-colors"
+                    className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
                   >
                     Edit
                   </button>

@@ -313,11 +313,10 @@ export default function BookingPage() {
   // ================================
   if (loading && !company) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ocean-50 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="text-5xl mb-4 animate-bounce">🏄</div>
           <div className="flex items-center gap-3 justify-center">
-            <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+            <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
             <span className="loading-text">Loading surf camp...</span>
           </div>
         </div>
@@ -327,9 +326,8 @@ export default function BookingPage() {
 
   if (!company) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ocean-50 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="card max-w-md w-full text-center">
-          <div className="text-5xl mb-4">😕</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Company Not Found</h1>
           <p className="text-gray-400">
             The surf company you&apos;re looking for doesn&apos;t exist.
@@ -344,10 +342,9 @@ export default function BookingPage() {
   // ================================
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ocean-50 to-white px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="card max-w-lg w-full text-center">
           <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-            <span className="text-4xl">🎉</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Booking Confirmed!
@@ -357,7 +354,7 @@ export default function BookingPage() {
             You&apos;ll receive a confirmation email at{" "}
             <strong className="text-gray-700">{customerInfo.email}</strong>.
           </p>
-          <div className="bg-ocean-50 rounded-xl p-5 text-left space-y-2.5 border border-ocean-100">
+          <div className="bg-gray-50 rounded-xl p-5 text-left space-y-2.5 border border-gray-100">
             <p>
               <span className="text-gray-500">Room:</span>{" "}
               <strong>{selectedRoom?.name}</strong>
@@ -399,7 +396,7 @@ export default function BookingPage() {
             )}
             <p>
               <span className="text-gray-500">Total:</span>{" "}
-              <strong className="text-ocean-600">
+              <strong className="text-gray-900">
                 {formatPrice(getTotalPrice())}
               </strong>
             </p>
@@ -413,15 +410,14 @@ export default function BookingPage() {
   // MAIN BOOKING PAGE
   // ================================
   return (
-    <div className="min-h-screen bg-gradient-to-b from-ocean-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="gradient-ocean text-white py-10 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 1440 320\'%3E%3Cpath fill=\'%23ffffff\' d=\'M0,160L48,176C96,192,192,224,288,218.7C384,213,480,171,576,149.3C672,128,768,128,864,149.3C960,171,1056,213,1152,218.7C1248,224,1344,192,1392,176L1440,160L1440,320L0,320Z\'/%3E%3C/svg%3E")' }}></div>
+      <div className="bg-gray-900 text-white py-10 relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 relative">
           <h1 className="text-3xl font-bold tracking-tight">{company.name}</h1>
           <p className="text-white/70 mt-1">{company.description}</p>
           <p className="text-white/50 text-sm mt-2 flex items-center gap-1">
-            📍 {company.city}, {company.country}
+            {company.city}, {company.country}
           </p>
         </div>
       </div>
@@ -442,7 +438,7 @@ export default function BookingPage() {
                     step > stepNum
                       ? "bg-emerald-500 text-white"
                       : step === stepNum
-                      ? "bg-ocean-600 text-white ring-4 ring-ocean-100"
+                      ? "bg-gray-900 text-white ring-4 ring-gray-100"
                       : "bg-gray-100 text-gray-400 border border-gray-200"
                   }`}
                 >
@@ -461,7 +457,7 @@ export default function BookingPage() {
                 </span>
                 {index < stepLabels.length - 1 && (
                   <div className={`w-8 h-0.5 mx-0.5 rounded-full ${
-                    step > stepNum + 1 ? "bg-emerald-300" : step > stepNum ? "bg-ocean-200" : "bg-gray-200"
+                    step > stepNum + 1 ? "bg-emerald-300" : step > stepNum ? "bg-gray-200" : "bg-gray-200"
                   }`}></div>
                 )}
               </div>
@@ -479,7 +475,7 @@ export default function BookingPage() {
         {/* STEP 1: SELECT DATES */}
         {step === 1 && (
           <div className="card">
-            <h2 className="text-section-title text-gray-900 mb-1">
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">
               When would you like to stay?
             </h2>
             <p className="text-gray-400 text-sm mb-5">Select your dates and number of guests</p>
@@ -527,8 +523,8 @@ export default function BookingPage() {
             </div>
 
             {checkIn && checkOut && new Date(checkIn) < new Date(checkOut) && (
-              <p className="text-ocean-600 mt-4 font-medium">
-                📅 {calculateNights(checkIn, checkOut)} night(s)
+              <p className="text-gray-900 mt-4 font-medium">
+                {calculateNights(checkIn, checkOut)} night(s)
               </p>
             )}
 
@@ -546,10 +542,10 @@ export default function BookingPage() {
         {step === 2 && (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-section-title text-gray-900">Choose a Room</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Choose a Room</h2>
               <button
                 onClick={() => goToStep(1)}
-                className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
+                className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors"
               >
                 ← Change dates
               </button>
@@ -557,7 +553,6 @@ export default function BookingPage() {
 
             {rooms.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-state-icon">😢</div>
                 <p className="empty-state-text">
                   No rooms available for your selected dates.
                 </p>
@@ -570,10 +565,10 @@ export default function BookingPage() {
                 {rooms.map((room) => (
                   <div
                     key={room._id}
-                    className={`card cursor-pointer transition-all hover:shadow-card-hover ${
+                    className={`card cursor-pointer transition-all hover:shadow-md ${
                       selectedRoom?._id === room._id
-                        ? "ring-2 ring-ocean-500 bg-ocean-50/30"
-                        : "hover:border-ocean-200"
+                        ? "ring-2 ring-gray-500 bg-gray-50/30"
+                        : "hover:border-gray-200"
                     }`}
                     onClick={() => setSelectedRoom(room)}
                   >
@@ -585,7 +580,7 @@ export default function BookingPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xl font-bold text-ocean-600">
+                        <p className="text-xl font-bold text-gray-900">
                           {formatPrice(room.pricePerNight)}
                         </p>
                         <p className="text-gray-400 text-xs">per night</p>
@@ -599,7 +594,7 @@ export default function BookingPage() {
                         {room.amenities.map((amenity) => (
                           <span
                             key={amenity}
-                            className="badge bg-ocean-50 text-ocean-700"
+                            className="badge bg-gray-100 text-gray-700"
                           >
                             {amenity}
                           </span>
@@ -612,7 +607,7 @@ export default function BookingPage() {
             )}
 
             {selectedRoom && (
-              <div className="mt-6 flex justify-between items-center bg-sand-50 rounded-xl p-4 border border-sand-100">
+              <div className="mt-6 flex justify-between items-center bg-gray-50 rounded-xl p-4 border border-gray-100">
                 <p className="text-gray-600">
                   Selected:{" "}
                   <strong className="text-gray-800">
@@ -636,13 +631,13 @@ export default function BookingPage() {
         {step === 3 && (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-section-title text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900">
                 Add a Surf Package{" "}
                 <span className="text-gray-400 text-sm font-normal">(optional)</span>
               </h2>
               <button
                 onClick={() => goToStep(2)}
-                className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
+                className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors"
               >
                 ← Change room
               </button>
@@ -652,10 +647,10 @@ export default function BookingPage() {
               {packages.map((pkg) => (
                 <div
                   key={pkg._id}
-                  className={`card cursor-pointer transition-all hover:shadow-card-hover ${
+                  className={`card cursor-pointer transition-all hover:shadow-md ${
                     selectedPackage?._id === pkg._id
-                      ? "ring-2 ring-ocean-500 bg-ocean-50/30"
-                      : "hover:border-ocean-200"
+                      ? "ring-2 ring-gray-500 bg-gray-50/30"
+                      : "hover:border-gray-200"
                   }`}
                   onClick={() =>
                     setSelectedPackage(
@@ -672,7 +667,7 @@ export default function BookingPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-bold text-ocean-600">
+                      <p className="text-xl font-bold text-gray-900">
                         {formatPrice(pkg.pricePerPerson)}
                       </p>
                       <p className="text-gray-400 text-xs">per person</p>
@@ -695,10 +690,10 @@ export default function BookingPage() {
               ))}
             </div>
 
-            <div className="mt-6 flex justify-between items-center bg-sand-50 rounded-xl p-4 border border-sand-100">
+            <div className="mt-6 flex justify-between items-center bg-gray-50 rounded-xl p-4 border border-gray-200">
               <p className="text-gray-600">
                 Running total:{" "}
-                <strong className="text-ocean-600">
+                <strong className="text-gray-900">
                   {formatPrice(getRoomTotal() + getPackageTotal())}
                 </strong>
               </p>
@@ -713,13 +708,13 @@ export default function BookingPage() {
         {step === 4 && (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-section-title text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900">
                 Add Activities{" "}
                 <span className="text-gray-400 text-sm font-normal">(optional)</span>
               </h2>
               <button
                 onClick={() => goToStep(3)}
-                className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
+                className="text-gray-900 hover:text-gray-700 text-sm font-medium transition-colors"
               >
                 ← Back to packages
               </button>
@@ -727,7 +722,6 @@ export default function BookingPage() {
 
             {activities.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-state-icon">🏄</div>
                 <p className="empty-state-text">No activities available at the moment.</p>
               </div>
             ) : (
@@ -739,8 +733,8 @@ export default function BookingPage() {
                   return (
                     <div
                       key={activity._id}
-                      className={`card cursor-pointer transition-all hover:shadow-card-hover ${
-                        isSelected ? "ring-2 ring-ocean-500 bg-ocean-50/30" : "hover:border-ocean-200"
+                      className={`card cursor-pointer transition-all hover:shadow-md ${
+                        isSelected ? "ring-2 ring-gray-400 bg-gray-50/30" : "hover:border-gray-200"
                       }`}
                       onClick={() => toggleActivity(activity)}
                     >
@@ -749,7 +743,7 @@ export default function BookingPage() {
                           <div
                             className={`w-5 h-5 rounded-md border-2 mt-1 flex items-center justify-center transition-colors ${
                               isSelected
-                                ? "bg-ocean-600 border-ocean-600 text-white"
+                                ? "bg-gray-900 border-gray-900 text-white"
                                 : "border-gray-300"
                             }`}
                           >
@@ -758,11 +752,11 @@ export default function BookingPage() {
                           <div>
                             <h3 className="font-semibold text-lg text-gray-900">{activity.name}</h3>
                             <p className="text-gray-400 text-sm">
-                              ⏱ {activity.duration} min · 👥 Max {activity.capacity}
+                              {activity.duration} min · Max {activity.capacity}
                             </p>
                           </div>
                         </div>
-                        <p className="text-xl font-bold text-ocean-600">
+                        <p className="text-xl font-bold text-gray-900">
                           {formatPrice(activity.price)}
                         </p>
                       </div>
@@ -777,14 +771,14 @@ export default function BookingPage() {
               </div>
             )}
 
-            <div className="mt-6 flex justify-between items-center bg-sand-50 rounded-xl p-4 border border-sand-100">
+            <div className="mt-6 flex justify-between items-center bg-gray-50 rounded-xl p-4 border border-gray-200">
               <p className="text-gray-600">
                 {selectedActivities.length > 0 ? (
                   <>
                     {selectedActivities.length} activit
                     {selectedActivities.length === 1 ? "y" : "ies"} selected
                     {" — "}
-                    <strong className="text-ocean-600">
+                    <strong className="text-gray-900">
                       +{formatPrice(getActivitiesTotal())}
                     </strong>
                   </>
@@ -805,10 +799,10 @@ export default function BookingPage() {
         {step === 5 && (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-section-title text-gray-900">Choose Time Slots</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Choose Time Slots</h2>
               <button
                 onClick={() => goToStep(4)}
-                className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
+                className="text-gray-900 hover:text-gray-700 text-sm font-medium transition-colors"
               >
                 ← Back to activities
               </button>
@@ -816,7 +810,7 @@ export default function BookingPage() {
 
             {loading ? (
               <div className="flex items-center gap-3 py-12">
-                <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
                 <span className="loading-text">Loading available sessions...</span>
               </div>
             ) : (
@@ -853,16 +847,16 @@ export default function BookingPage() {
                                 }
                                 className={`p-3.5 rounded-xl border-2 text-left transition-all ${
                                   isSelected
-                                    ? "border-ocean-500 bg-ocean-50 shadow-md"
+                                    ? "border-gray-900 bg-gray-50 shadow-md"
                                     : isFull
                                     ? "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
-                                    : "border-gray-100 hover:border-ocean-300 hover:shadow-sm cursor-pointer"
+                                    : "border-gray-100 hover:border-gray-300 hover:shadow-sm cursor-pointer"
                                 }`}
                               >
                                 <p className="font-medium text-sm text-gray-600">
                                   {formatDate(session.date)}
                                 </p>
-                                <p className="text-ocean-600 font-semibold">
+                                <p className="text-gray-900 font-semibold">
                                   {session.startTime} – {session.endTime}
                                 </p>
                                 <p
@@ -889,10 +883,10 @@ export default function BookingPage() {
               </div>
             )}
 
-            <div className="mt-6 flex justify-between items-center bg-sand-50 rounded-xl p-4 border border-sand-100">
+            <div className="mt-6 flex justify-between items-center bg-gray-50 rounded-xl p-4 border border-gray-200">
               <p className="text-gray-600">
                 Running total:{" "}
-                <strong className="text-ocean-600">
+                <strong className="text-gray-900">
                   {formatPrice(getTotalPrice())}
                 </strong>
               </p>
@@ -908,12 +902,12 @@ export default function BookingPage() {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="md:col-span-2 card">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-section-title text-gray-900">Your Details</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Your Details</h2>
                 <button
                   onClick={() =>
                     goToStep(selectedActivities.length > 0 ? 5 : 4)
                   }
-                  className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
+                  className="text-gray-900 hover:text-gray-700 text-sm font-medium transition-colors"
                 >
                   ← Back
                 </button>
@@ -1020,7 +1014,7 @@ export default function BookingPage() {
             </div>
 
             {/* Mini Summary Sidebar */}
-            <div className="card h-fit bg-sand-50 border border-sand-100">
+            <div className="card h-fit bg-gray-50 border border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-4">Summary</h3>
               <div className="space-y-2.5 text-sm">
                 <div className="flex justify-between">
@@ -1043,10 +1037,10 @@ export default function BookingPage() {
                     <span className="font-medium text-gray-700">{selectedActivities.length}</span>
                   </div>
                 )}
-                <hr className="border-sand-200" />
+                <hr className="border-gray-200" />
                 <div className="flex justify-between font-bold text-lg">
                   <span className="text-gray-900">Total</span>
-                  <span className="text-ocean-600">
+                  <span className="text-gray-900">
                     {formatPrice(getTotalPrice())}
                   </span>
                 </div>
@@ -1060,10 +1054,10 @@ export default function BookingPage() {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="md:col-span-2 card">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-section-title text-gray-900">Review Your Booking</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Review Your Booking</h2>
                 <button
                   onClick={() => goToStep(6)}
-                  className="text-ocean-600 hover:text-ocean-700 text-sm font-medium transition-colors"
+                  className="text-gray-900 hover:text-gray-700 text-sm font-medium transition-colors"
                 >
                   ← Edit details
                 </button>
@@ -1159,7 +1153,7 @@ export default function BookingPage() {
                             </p>
                           )}
                         </div>
-                        <span className="font-medium text-ocean-600">
+                        <span className="font-medium text-gray-900">
                           {formatPrice(sa.activity.price)}
                         </span>
                       </div>
@@ -1182,7 +1176,7 @@ export default function BookingPage() {
             </div>
 
             {/* Price Breakdown Sidebar */}
-            <div className="card h-fit bg-sand-50 border border-sand-100">
+            <div className="card h-fit bg-gray-50 border border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-4">Price Breakdown</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
@@ -1210,10 +1204,10 @@ export default function BookingPage() {
                   </div>
                 )}
 
-                <hr className="border-sand-200" />
+                <hr className="border-gray-200" />
                 <div className="flex justify-between text-lg font-bold">
                   <span className="text-gray-900">Total</span>
-                  <span className="text-ocean-600">
+                  <span className="text-gray-900">
                     {formatPrice(getTotalPrice())}
                   </span>
                 </div>
@@ -1225,7 +1219,7 @@ export default function BookingPage() {
         {step === 8 && (
           <div className="grid md:grid-cols-3 gap-6">
             <div className="md:col-span-2 card">
-              <h2 className="text-section-title text-gray-900 mb-1">Payment</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-1">Payment</h2>
               <p className="text-gray-400 text-sm mb-6">
                 Choose how you&apos;d like to pay for your booking.
               </p>
@@ -1235,19 +1229,16 @@ export default function BookingPage() {
                 {([
                   {
                     id: "pay_on_arrival" as const,
-                    icon: "💵",
                     label: "Pay on Arrival",
                     desc: "Pay at the surf camp when you check in",
                   },
                   {
                     id: "stripe" as const,
-                    icon: "💳",
                     label: "Stripe",
                     desc: "Secure online card payment",
                   },
                   {
                     id: "paypal" as const,
-                    icon: "🅿️",
                     label: "PayPal",
                     desc: "Pay with your PayPal account",
                   },
@@ -1258,12 +1249,12 @@ export default function BookingPage() {
                     onClick={() => setPaymentMethod(method.id)}
                     className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all ${
                       paymentMethod === method.id
-                        ? "border-ocean-500 bg-ocean-50/50 shadow-sm"
-                        : "border-gray-100 hover:border-ocean-200"
+                        ? "border-gray-900 bg-gray-50/50 shadow-sm"
+                        : "border-gray-100 hover:border-gray-200"
                     }`}
                   >
-                    <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-2xl shrink-0">
-                      {method.icon}
+                    <div>
+                      <div className="w-3 h-3 rounded-full bg-gray-900 shrink-0 mt-1"></div>
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900">{method.label}</p>
@@ -1272,7 +1263,7 @@ export default function BookingPage() {
                     <div className="ml-auto">
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                         paymentMethod === method.id
-                          ? "border-ocean-500 bg-ocean-500"
+                          ? "border-gray-900 bg-gray-500"
                           : "border-gray-300"
                       }`}>
                         {paymentMethod === method.id && (
@@ -1286,7 +1277,7 @@ export default function BookingPage() {
 
               {/* Payment method details */}
               {paymentMethod === "pay_on_arrival" && (
-                <div className="p-4 bg-sand-50 rounded-xl border border-sand-100 mb-6">
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 mb-6">
                   <p className="text-sm text-gray-600">
                     Your booking will be confirmed immediately. Please pay at the reception when you arrive.
                   </p>
@@ -1324,7 +1315,7 @@ export default function BookingPage() {
             </div>
 
             {/* Price Summary */}
-            <div className="card h-fit bg-sand-50 border border-sand-100">
+            <div className="card h-fit bg-gray-50 border border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
@@ -1349,10 +1340,10 @@ export default function BookingPage() {
                     <span className="font-medium text-gray-700">{formatPrice(getActivitiesTotal())}</span>
                   </div>
                 )}
-                <hr className="border-sand-200" />
+                <hr className="border-gray-200" />
                 <div className="flex justify-between text-lg font-bold">
                   <span className="text-gray-900">Total</span>
-                  <span className="text-ocean-600">
+                  <span className="text-gray-900">
                     {formatPrice(getTotalPrice())}
                   </span>
                 </div>

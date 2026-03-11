@@ -64,12 +64,11 @@ export default function AdminCompaniesPage() {
 
       {loading ? (
         <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
           <span className="loading-text">Loading companies...</span>
         </div>
       ) : companies.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">🏢</div>
           <p className="empty-state-text">No companies registered yet.</p>
         </div>
       ) : (
@@ -149,7 +148,7 @@ export default function AdminCompaniesPage() {
                             onClick={() =>
                               updateSubscription(company._id, "active")
                             }
-                            className="text-xs font-medium text-ocean-600 hover:text-ocean-700 transition-colors"
+                            className="text-xs font-medium text-gray-700 hover:text-gray-900 transition-colors"
                           >
                             Reactivate Sub.
                           </button>

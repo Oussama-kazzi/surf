@@ -57,13 +57,11 @@ export default function CustomersPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <div className="py-12">
           <span className="loading-text">Loading customers...</span>
         </div>
       ) : filteredCustomers.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">👥</div>
           <p className="empty-state-text">
             {search ? "No customers match your search." : "No customers yet."}
           </p>

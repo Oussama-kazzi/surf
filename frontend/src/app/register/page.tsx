@@ -51,17 +51,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-ocean-50 to-white px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
       <div className="card max-w-md w-full">
-        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 gradient-ocean rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-            <span className="text-3xl">🏄</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mt-4">
+          <h1 className="text-2xl font-semibold text-gray-900">
             Create your SurfBook Account
           </h1>
-          <p className="text-gray-400 mt-1">
+          <p className="text-gray-500 mt-1 text-sm">
             Set up your surf company in minutes.
           </p>
         </div>
@@ -163,9 +159,9 @@ export default function RegisterPage() {
         </form>
 
         {/* Login link */}
-        <p className="text-center text-gray-400 text-sm mt-6">
+        <p className="text-center text-gray-500 text-sm mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-ocean-600 hover:text-ocean-700 font-medium">
+          <Link href="/login" className="text-gray-900 hover:underline font-medium">
             Log in
           </Link>
         </p>

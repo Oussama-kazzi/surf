@@ -134,7 +134,7 @@ export default function RoomsPage() {
           ================================ */}
       {showForm && (
         <div className="form-card">
-          <h2 className="text-section-title text-gray-900 mb-5">
+          <h2 className="text-lg font-semibold text-gray-900 mb-5">
             {editingRoom ? "Edit Room" : "New Room"}
           </h2>
 
@@ -242,14 +242,12 @@ export default function RoomsPage() {
           ROOMS LIST
           ================================ */}
       {loading ? (
-        <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <div className="py-12">
           <span className="loading-text">Loading rooms...</span>
         </div>
       ) : rooms.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">🏠</div>
-          <p className="empty-state-text">No rooms yet. Add your first room!</p>
+          <p className="empty-state-text">No rooms yet. Add your first room.</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -257,13 +255,13 @@ export default function RoomsPage() {
             <div key={room._id} className="card-hover group">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-card-title text-gray-900">{room.name}</h3>
+                  <h3 className="text-base font-semibold text-gray-900">{room.name}</h3>
                   <p className="text-gray-400 text-sm capitalize mt-0.5">
                     {room.type} · Up to {room.capacity} guests
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xl font-bold text-ocean-600">
+                  <p className="text-xl font-bold text-gray-900">
                     {formatPrice(room.pricePerNight)}
                   </p>
                   <p className="text-gray-400 text-xs">/night</p>
@@ -278,7 +276,7 @@ export default function RoomsPage() {
                   {room.amenities.map((amenity) => (
                     <span
                       key={amenity}
-                      className="badge bg-ocean-50 text-ocean-700"
+                      className="badge bg-gray-100 text-gray-700"
                     >
                       {amenity}
                     </span>
@@ -304,7 +302,7 @@ export default function RoomsPage() {
                 <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
                   <button
                     onClick={() => openEditForm(room)}
-                    className="text-sm font-medium text-ocean-600 hover:text-ocean-800 transition-colors"
+                    className="text-sm font-medium text-gray-900 hover:text-gray-800 transition-colors"
                   >
                     Edit
                   </button>

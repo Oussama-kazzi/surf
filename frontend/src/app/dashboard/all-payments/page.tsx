@@ -49,12 +49,11 @@ export default function AdminAllPaymentsPage() {
 
       {loading ? (
         <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+          <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
           <span className="loading-text">Loading payments...</span>
         </div>
       ) : payments.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">💳</div>
           <p className="empty-state-text">No payments recorded yet.</p>
         </div>
       ) : (

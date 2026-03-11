@@ -129,7 +129,7 @@ export default function PackagesPage() {
       {/* Package Form */}
       {showForm && (
         <div className="form-card">
-          <h2 className="text-section-title text-gray-900 mb-5">
+          <h2 className="text-lg font-semibold text-gray-900 mb-5">
             {editingPackage ? "Edit Package" : "New Package"}
           </h2>
 
@@ -250,15 +250,13 @@ export default function PackagesPage() {
 
       {/* Packages List */}
       {loading ? (
-        <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <div className="py-12">
           <span className="loading-text">Loading packages...</span>
         </div>
       ) : packages.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">🏄</div>
           <p className="empty-state-text">
-            No packages yet. Create your first surf package!
+            No packages yet. Create your first surf package.
           </p>
         </div>
       ) : (
@@ -267,7 +265,7 @@ export default function PackagesPage() {
             <div key={pkg._id} className="card-hover group">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-card-title text-gray-900">{pkg.name}</h3>
+                  <h3 className="text-base font-semibold text-gray-900">{pkg.name}</h3>
                   <p className="text-gray-400 text-sm mt-0.5">
                     {pkg.durationDays} days ·{" "}
                     <span className="capitalize">{pkg.difficulty}</span> ·
@@ -275,7 +273,7 @@ export default function PackagesPage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xl font-bold text-ocean-600">
+                  <p className="text-xl font-bold text-gray-900">
                     {formatPrice(pkg.pricePerPerson)}
                   </p>
                   <p className="text-gray-400 text-xs">/person</p>
@@ -301,7 +299,7 @@ export default function PackagesPage() {
                 <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
                   <button
                     onClick={() => openEditForm(pkg)}
-                    className="text-sm font-medium text-ocean-600 hover:text-ocean-800 transition-colors"
+                    className="text-sm font-medium text-gray-900 hover:text-gray-800 transition-colors"
                   >
                     Edit
                   </button>

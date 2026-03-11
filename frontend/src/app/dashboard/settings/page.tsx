@@ -186,7 +186,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center gap-3 py-12">
-        <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
         <span className="loading-text">Loading settings...</span>
       </div>
     );
@@ -215,8 +215,8 @@ export default function SettingsPage() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === tab.id
-                ? "bg-ocean-600 text-white shadow-md"
-                : "bg-white text-gray-500 hover:bg-sand-50 border border-gray-100"
+                ? "bg-gray-900 text-white shadow-md"
+                : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-100"
             }`}
           >
             {tab.label}
@@ -241,9 +241,9 @@ export default function SettingsPage() {
 
           <div className="form-card">
             {company && (
-              <div className="mb-6 p-4 bg-ocean-50 rounded-xl border border-ocean-100">
+              <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
                 <p className="text-sm text-gray-600">Your booking page URL:</p>
-                <p className="font-mono text-ocean-700 font-medium mt-1">
+                <p className="font-mono text-gray-700 font-medium mt-1">
                   {typeof window !== "undefined"
                     ? window.location.origin
                     : ""}
@@ -383,19 +383,19 @@ export default function SettingsPage() {
                     {
                       id: "manual",
                       label: "Manual Payment",
-                      icon: "💵",
+                      icon: "",
                       desc: "Customers pay on arrival",
                     },
                     {
                       id: "stripe",
                       label: "Stripe",
-                      icon: "💳",
+                      icon: "",
                       desc: "Online card payments",
                     },
                     {
                       id: "bank_transfer",
                       label: "Bank Transfer",
-                      icon: "🏦",
+                      icon: "",
                       desc: "Wire transfer to your bank",
                     },
                   ] as {
@@ -413,8 +413,8 @@ export default function SettingsPage() {
                     }
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       paymentForm.method === option.id
-                        ? "border-ocean-500 bg-ocean-50/50 shadow-sm"
-                        : "border-gray-100 hover:border-ocean-200"
+                        ? "border-gray-500 bg-gray-50/50 shadow-sm"
+                        : "border-gray-100 hover:border-gray-200"
                     }`}
                   >
                     <div className="text-2xl mb-2">{option.icon}</div>
@@ -431,7 +431,7 @@ export default function SettingsPage() {
 
             {/* Manual Payment Fields */}
             {paymentForm.method === "manual" && (
-              <div className="mb-6 p-5 bg-sand-50 rounded-xl border border-sand-100">
+              <div className="mb-6 p-5 bg-gray-50 rounded-xl border border-gray-100">
                 <label className="label">Payment Instructions</label>
                 <textarea
                   className="input"
@@ -456,7 +456,7 @@ export default function SettingsPage() {
             {paymentForm.method === "stripe" && (
               <div className="mb-6 p-5 bg-purple-50 rounded-xl border border-purple-100">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-2xl">💳</span>
+                  <span className="text-2xl"></span>
                   <div>
                     <p className="font-medium text-gray-900">
                       Stripe Integration
@@ -478,7 +478,7 @@ export default function SettingsPage() {
 
             {/* Bank Transfer Fields */}
             {paymentForm.method === "bank_transfer" && (
-              <div className="mb-6 p-5 bg-sand-50 rounded-xl border border-sand-100">
+              <div className="mb-6 p-5 bg-gray-50 rounded-xl border border-gray-100">
                 <p className="text-sm font-medium text-gray-700 mb-4">
                   Bank Account Details
                 </p>
@@ -698,12 +698,11 @@ export default function SettingsPage() {
           {/* Payments Table */}
           {paymentsLoading ? (
             <div className="flex items-center gap-3 py-12">
-              <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+              <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
               <span className="loading-text">Loading payments...</span>
             </div>
           ) : payments.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-state-icon">💳</div>
               <p className="empty-state-text">No payments recorded yet.</p>
             </div>
           ) : (

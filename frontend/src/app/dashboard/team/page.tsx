@@ -105,7 +105,7 @@ export default function TeamPage() {
       {/* Add Member Form */}
       {showForm && (
         <form onSubmit={handleAddMember} className="form-card">
-          <h2 className="text-section-title text-gray-900 mb-5">Add Team Member</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-5">Add Team Member</h2>
 
           {formError && <div className="alert-error">{formError}</div>}
 
@@ -192,13 +192,11 @@ export default function TeamPage() {
 
       {/* Team List */}
       {loading ? (
-        <div className="flex items-center gap-3 py-12">
-          <div className="w-2 h-2 rounded-full bg-ocean-400 animate-pulse-dot"></div>
+        <div className="py-12">
           <span className="loading-text">Loading team...</span>
         </div>
       ) : members.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">👤</div>
           <p className="empty-state-text">No team members yet.</p>
         </div>
       ) : (
@@ -228,7 +226,7 @@ export default function TeamPage() {
                       </span>
                     ) : (
                       <select
-                        className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-ocean-300"
+                        className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-gray-300"
                         value={member.role}
                         onChange={(e) =>
                           handleRoleChange(member._id, e.target.value)
