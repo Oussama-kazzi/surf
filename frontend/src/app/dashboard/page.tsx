@@ -9,15 +9,13 @@ import {
   customerApi,
   roomApi,
   paymentApi,
-  adminApi,
   activityApi,
 } from "@/lib/api";
 import { formatPrice, formatDate, getStatusColor, capitalize } from "@/lib/helpers";
-import { Booking, Analytics, Room } from "@/types";
+import { Booking, Room } from "@/types";
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const isSuperAdmin = user?.role === "super_admin";
 
   const [stats, setStats] = useState({
     totalBookings: 0,
@@ -32,16 +30,11 @@ export default function DashboardPage() {
   const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
   const [upcomingArrivals, setUpcomingArrivals] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    if (isSuperAdmin) {
-      loadAdminData();
-    } else {
-      loadCompanyData();
-    }
-  }, [user, isSuperAdmin]);
+    loadCompanyData();
+  }, [user]);
 
   async function loadCompanyData() {
     try {
@@ -116,75 +109,10 @@ export default function DashboardPage() {
     }
   }
 
-  async function loadAdminData() {
-    try {
-      const data = await adminApi.getAnalytics();
-      setAnalytics(data.analytics);
-    } catch (error) {
-      console.error("Error loading admin dashboard:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   if (loading) {
     return (
       <div className="py-12">
         <span className="loading-text">Loading dashboard...</span>
-      </div>
-    );
-  }
-
-  // Super Admin View
-  if (isSuperAdmin && analytics) {
-    return (
-      <div>
-        <div className="page-header">
-          <div>
-            <h1 className="page-title">Platform Analytics</h1>
-            <p className="page-subtitle">Overview of all companies and revenue</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {[
-            { label: "Companies", value: analytics.totalCompanies },
-            { label: "Total Bookings", value: analytics.totalBookings },
-            { label: "Customers", value: analytics.totalCustomers },
-            {
-              label: "Booking Revenue",
-              value: formatPrice(analytics.totalRevenue),
-              color: "text-green-600",
-            },
-            {
-              label: "Active Subscriptions",
-              value: analytics.activeSubscriptions,
-            },
-            {
-              label: "Subscription Revenue",
-              value: formatPrice(analytics.totalSubscriptionRevenue),
-              color: "text-green-600",
-            },
-            {
-              label: "Monthly Sub Revenue",
-              value: formatPrice(analytics.monthlySubscriptionRevenue),
-              color: "text-green-600",
-            },
-          ].map((stat) => (
-            <div key={stat.label} className="stat-card">
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {stat.label}
-              </p>
-              <p
-                className={`text-2xl font-bold mt-1.5 ${
-                  stat.color || "text-gray-900"
-                }`}
-              >
-                {stat.value}
-              </p>
-            </div>
-          ))}
-        </div>
       </div>
     );
   }

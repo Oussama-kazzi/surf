@@ -12,7 +12,7 @@ import { useAuth } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, logout } = useAuth(); // Import logout to clear unauthorized sessions
 
   // Form state
   const [email, setEmail] = useState("");
@@ -29,10 +29,12 @@ export default function LoginPage() {
     try {
       const loggedInUser = await login(email, password);
 
-      // Redirect based on role
+      // Security Check: Is this a super admin trying to use the company login?
       if (loggedInUser.role === "super_admin") {
-        router.push("/dashboard");
+        logout(); // Log them out immediately
+        setError("Access denied. Please use the Super Admin login portal.");
       } else {
+        // Success! Send company members to the dashboard
         router.push("/dashboard");
       }
     } catch (err: any) {

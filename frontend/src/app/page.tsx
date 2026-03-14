@@ -74,13 +74,21 @@ export default function HomePage() {
             Manage rooms, packages, bookings, and customers — all in one place.
           </p>
 
-          {/* CTA Button — high contrast white on dark background */}
-          <Link
-            href="/register"
-            className="inline-block bg-sky-500 text-white font-semibold text-lg px-10 py-4 rounded-lg hover:bg-sky-600 transition-colors"
-          >
-            Start Free Trial
-          </Link>
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/register"
+              className="inline-block bg-sky-500 text-white font-semibold text-lg px-10 py-4 rounded-lg hover:bg-sky-600 transition-colors"
+            >
+              Start Free Trial
+            </Link>
+            <Link
+              href="/book/bali-surf-camp"
+              className="inline-block border border-white/60 text-white font-semibold text-lg px-10 py-4 rounded-lg hover:bg-white/10 transition-colors"
+            >
+              Book a Demo
+            </Link>
+          </div>
         </div>
       </section>
 

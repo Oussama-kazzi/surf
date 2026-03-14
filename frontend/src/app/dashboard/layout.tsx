@@ -25,10 +25,14 @@ export default function DashboardLayout({
   const isSuperAdmin = user?.role === "super_admin";
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
+    if (!loading) {
+      if (!user) {
+        router.push("/login");
+      } else if (isSuperAdmin) {
+        router.push("/super-admin"); // Redirect super admins away
+      }
     }
-  }, [user, loading, router]);
+  }, [user, loading, isSuperAdmin, router]);
 
   useEffect(() => {
     if (user && !isSuperAdmin && user.companyId) {
@@ -85,27 +89,7 @@ export default function DashboardLayout({
     { label: "Settings", href: "/dashboard/settings", section: "billing" },
   ];
 
-  const superAdminNavItems = [
-    { label: "Analytics", href: "/dashboard", section: "" },
-    { label: "Companies", href: "/dashboard/companies", section: "platform" },
-    {
-      label: "Subscriptions",
-      href: "/dashboard/subscriptions",
-      section: "platform",
-    },
-    {
-      label: "All Bookings",
-      href: "/dashboard/all-bookings",
-      section: "platform",
-    },
-    {
-      label: "All Payments",
-      href: "/dashboard/all-payments",
-      section: "platform",
-    },
-  ];
-
-  const navItems = isSuperAdmin ? superAdminNavItems : companyNavItems;
+  const navItems = companyNavItems;
 
   const filteredNavItems = navItems.filter((item) => {
     if (user.role === "staff") {
@@ -155,11 +139,6 @@ export default function DashboardLayout({
               SurfBook
             </span>
           </Link>
-          {isSuperAdmin && (
-            <span className="text-[10px] font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded mt-2 inline-block uppercase tracking-wider">
-              Super Admin
-            </span>
-          )}
         </div>
 
         {/* Nav links — text only */}
